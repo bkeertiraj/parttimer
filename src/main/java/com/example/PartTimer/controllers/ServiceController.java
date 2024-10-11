@@ -28,6 +28,7 @@ public class ServiceController {
 
     @PostMapping
     public ResponseEntity<Service> createService(@RequestBody Service service) {
+        System.out.println("Received service: " + service);
         Service newService = serviceService.createService(service);
         return ResponseEntity.ok(newService);
     }
