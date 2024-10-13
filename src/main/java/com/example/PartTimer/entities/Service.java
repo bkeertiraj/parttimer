@@ -3,6 +3,9 @@ package com.example.PartTimer.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 public class Service {
@@ -25,4 +28,7 @@ public class Service {
 
     @Column
     private String description;
+
+    @ManyToMany(mappedBy = "services", fetch = FetchType.EAGER)
+    private Set<Employee> employees = new HashSet<>();
 }
