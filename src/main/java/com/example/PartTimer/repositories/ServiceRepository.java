@@ -1,6 +1,5 @@
 package com.example.PartTimer.repositories;
 
-import com.example.PartTimer.entities.Employee;
 import com.example.PartTimer.entities.Service;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +16,8 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     List<Service> findAll();
 
-    @Query("SELECT s FROM Service s JOIN FETCH s.employees WHERE s.serviceId = :serviceId")
-    Optional<Service> findByIdWithEmployees(@Param("serviceId") Long serviceId);
+//    @Query("SELECT s FROM Service s JOIN FETCH s.employees WHERE s.serviceId = :serviceId")
+//    Optional<Service> findByIdWithEmployees(@Param("serviceId") Long serviceId);
 
 
 }

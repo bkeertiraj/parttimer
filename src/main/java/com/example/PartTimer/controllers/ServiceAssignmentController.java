@@ -11,23 +11,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class ServiceAssignmentController {
-
-    @Autowired
-    private ServiceAssignmentService serviceAssignmentService;
-
-    @PostMapping("/owners/{ownerId}/employees/{employeeId}/services/{serviceId}/assign")
-    public ResponseEntity<EmployeeDTO> assignServiceToEmployee(
-            @PathVariable Long ownerId,
-            @PathVariable Long employeeId,
-            @PathVariable Long serviceId) {
-        EmployeeDTO updatedEmployee = serviceAssignmentService.assignServiceToEmployee(ownerId, employeeId, serviceId);
-        return ResponseEntity.ok(updatedEmployee);
-    }
-
-    @GetMapping("/services/{serviceId}/employees")
-    public ResponseEntity<List<EmployeeDTO>> getEmployeesByService(@PathVariable Long serviceId) {
-        List<EmployeeDTO> employees = serviceAssignmentService.getEmployeesByService(serviceId);
-        return ResponseEntity.ok(employees);
-    }
+//
+//    @Autowired
+//    private ServiceAssignmentService serviceAssignmentService;
+//
+//    @PostMapping("/owners/{ownerId}/employees/{employeeId}/services/{serviceId}/assign")
+//    public ResponseEntity<EmployeeDTO> assignServiceToEmployee(
+//            @PathVariable Long ownerId,
+//            @PathVariable Long employeeId,
+//            @PathVariable Long serviceId) {
+//        EmployeeDTO updatedEmployee = serviceAssignmentService.assignServiceToEmployee(ownerId, employeeId, serviceId);
+//        return ResponseEntity.ok(updatedEmployee);
+//    }
+//
+//    @GetMapping("/services/{serviceId}/employees")
+//    public ResponseEntity<List<EmployeeDTO>> getEmployeesByService(@PathVariable Long serviceId) {
+//        List<EmployeeDTO> employees = serviceAssignmentService.getEmployeesByService(serviceId);
+//        return ResponseEntity.ok(employees);
+//    }
 
 }

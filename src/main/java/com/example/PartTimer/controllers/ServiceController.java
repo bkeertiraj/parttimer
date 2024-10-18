@@ -20,11 +20,11 @@ public class ServiceController {
     public List<Service> getAllService() {
         return serviceService.getAllServices();
     }
-
-    @GetMapping("/with-employees")
-    public List<ServiceWithEmployeesDTO> getAllServicesWithEmployees() {
-        return serviceService.getAllServicesWithEmployees();
-    }
+//
+//    @GetMapping("/with-employees")
+//    public List<ServiceWithEmployeesDTO> getAllServicesWithEmployees() {
+//        return serviceService.getAllServicesWithEmployees();
+//    }
 
     @PostMapping
     public ResponseEntity<Service> createService(@RequestBody Service service) {

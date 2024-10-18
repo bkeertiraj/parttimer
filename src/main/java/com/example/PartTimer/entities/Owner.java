@@ -1,8 +1,5 @@
 package com.example.PartTimer.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,35 +9,32 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@ToString(exclude = {"employees", "assignedOwners"})
-@EqualsAndHashCode(callSuper = true, exclude = {"employees", "assignedOwners"})
-@DiscriminatorValue("Owner")
-public class Owner extends Employee {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long ownerId;
+@NoArgsConstructor
+@AllArgsConstructor
+@DiscriminatorValue("OWNER")
+public class Owner extends User {
 
-//    @Column(nullable = false)
-//    private String name;
+    @OneToOne(mappedBy = "owner")
+    private Organization ownedOrganization;
+
+//    // Methods specific to owners
+//    public void assignCoOwner(CoOwner coOwner) {
+//        if (this.ownedOrganization != null) {
+//            this.ownedOrganization.addCoOwner(coOwner);
+//        }
+//    }
 //
-//    @Column(unique = true, nullable = true)
-//    private String email;
-
-    @Column(nullable = true)
-    private String password;
-
-    @Column
-    private String phoneNumber;
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "owners")
-    private Set<Employee> employees = new HashSet<>();
+//    public void removeCoOwner(CoOwner coOwner) {
+//        if (this.ownedOrganization != null) {
+//            this.ownedOrganization.removeCoOwner(coOwner);
+//        }
+//    }
 
     @ManyToMany
     @JoinTable(
             name = "owner_assignments",
-            joinColumns = @JoinColumn(name = "owner_id", referencedColumnName = "employeeId"),
-            inverseJoinColumns = @JoinColumn(name = "assigned_owner_id", referencedColumnName = "employeeId")
+            joinColumns = @JoinColumn(name = "owner_id", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "assigned_owner_id", referencedColumnName = "userId")
     )
     private Set<Owner> assignedOwners = new HashSet<>(); //other owners that this owner can assign tasks to
 }

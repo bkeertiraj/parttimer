@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/service-employee")
 public class ServiceEmployeeController {
-
-    @Autowired
-    private ServiceEmployeeService serviceEmployeeService;
-
-    @PostMapping("/assign")
-    public ResponseEntity<ServiceEmployee> assignEmployeeToService(@RequestBody ServiceEmployeeDTO serviceEmployeeDTO) {
-        ServiceEmployee assignedServiceEmployee = serviceEmployeeService.assignEmployeeToService(
-
-                serviceEmployeeDTO.getServiceId(),
-                serviceEmployeeDTO.getEmployeeId(),
-                serviceEmployeeDTO.getBaseFee()
-        );
-        return new ResponseEntity<>(assignedServiceEmployee, HttpStatus.CREATED);
-    }
+//
+//    @Autowired
+//    private ServiceEmployeeService serviceEmployeeService;
+//
+//    @PostMapping("/assign")
+//    public ResponseEntity<ServiceEmployee> assignEmployeeToService(@RequestBody ServiceEmployeeDTO serviceEmployeeDTO) {
+//        ServiceEmployee assignedServiceEmployee = serviceEmployeeService.assignEmployeeToService(
+//
+//                serviceEmployeeDTO.getServiceId(),
+//                serviceEmployeeDTO.getEmployeeId(),
+//                serviceEmployeeDTO.getBaseFee()
+//        );
+//        return new ResponseEntity<>(assignedServiceEmployee, HttpStatus.CREATED);
+//    }
 }

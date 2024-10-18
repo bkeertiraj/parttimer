@@ -7,15 +7,8 @@ import java.util.List;
 @Data
 public class EmployeeDTO {
 
-    private Long employeeId;
+    private Long id;
     private String name;
-    private String email;
-    private String designation;
-    private String status;
+    private String role;
 
-    private Boolean isAdmin;
-    private String roleType;
-    private List<OwnerDTO> owners;
-
-    private List<ServiceDTO> services;
 }

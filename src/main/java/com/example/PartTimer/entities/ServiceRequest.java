@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -12,32 +13,31 @@ public class ServiceRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long requestId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer; // foreign key
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    private Service service; // foreign key
+    private Service service;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private Owner owner; // foreign key
+    private LocalDateTime requestDate;
 
-    @Column(nullable = false)
-    private String status; // ex: initiated, confirmed, in Progress, completed
+    private String status;
 
-    @Column(nullable = false)
-    private String address; // where the service has to be performed
+    private String address;
 
-    @Column(nullable = false)
-    private LocalDate date; // date of the service request
+    @Column(name = "organization_id")
+    private Long organizationId; // Store the ID of the proposing organization
 
-    @Column(nullable = false)
-    private LocalTime time; // time of the service request
+    @Column(name = "proposed_price")
+    private double proposedPrice; // Store the proposed price directly in the ServiceRequest
 
-    @Column(nullable = false)
-    private double estimatedRevenue;
+    private String comments; // Store any additional comments
+
+    private double ratings;
+
+    // Additional fields for ratings and other metadata if needed
 }

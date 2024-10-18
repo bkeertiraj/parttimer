@@ -3,6 +3,9 @@ package com.example.PartTimer.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 public class Booking {
@@ -15,11 +18,15 @@ public class Booking {
     @JoinColumn(name = "service_id", nullable = false)
     private Service service;
 
-    @Column(nullable = false)
-    private String customerName;
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userId", nullable = false)
+    private User user;
+
+    @Column(nullable = true)
+    private String name;  // Name of the person the service is for (could be different from user)
 
     @Column(nullable = false)
-    private String email;
+    private String email;  // Email of the person the service is for (could be different from user)
 
     @Column(nullable = false)
     private String location;
@@ -32,4 +39,29 @@ public class Booking {
 
     @Column
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BookingStatus status = BookingStatus.POSTED;
+
+    @ManyToMany
+    @JoinTable(
+            name = "booking_providers",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> serviceProviders = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Column
+    private Integer rating;
+
+    @Column(length = 500)
+    private String feedback;
+
+
+
 }

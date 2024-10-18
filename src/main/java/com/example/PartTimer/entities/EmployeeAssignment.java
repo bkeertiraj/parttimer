@@ -17,7 +17,7 @@ public class EmployeeAssignment {
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee; // foreign key
+    private User employee; // foreign key
 
     @Column(nullable = false)
     private String status;

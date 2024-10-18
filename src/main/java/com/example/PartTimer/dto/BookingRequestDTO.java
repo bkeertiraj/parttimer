@@ -5,8 +5,9 @@ import lombok.Data;
 @Data
 public class BookingRequestDTO {
     private Long serviceId;
-    private String customerName;
-    private String email;
+    private Long userId;  // Add userId to identify the user making the booking
+    private String name;  // Add name for the person the booking is for
+    private String email;  // Add email for the person the booking is for
     private String location;
     private String date;
     private String time;

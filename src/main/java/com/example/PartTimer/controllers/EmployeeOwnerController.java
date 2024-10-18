@@ -13,24 +13,24 @@ import java.util.List;
 @RequestMapping("/api")
 public class EmployeeOwnerController {
 
-    @Autowired
-    private EmployeeOwnerService employeeOwnerService;
-
-    @PostMapping("/employees/{employeeId}/owners/{ownerId}/assign")
-    public String assignEmployeeToOwner(@PathVariable Long employeeId, @PathVariable Long ownerId) {
-        employeeOwnerService.assignEmployeeToOwner(employeeId, ownerId);
-        return "Employee assigned to Owner successfully!";
-    }
-
-    @GetMapping("/owners-with-employees")
-    public ResponseEntity<List<OwnerWithEmployeesDTO>> getAllOwnersWithEmployees() {
-        List<OwnerWithEmployeesDTO> ownersWithEmployees = employeeOwnerService.getAllOwnersWithEmployees();
-        return ResponseEntity.ok(ownersWithEmployees);
-    }
-
-    @GetMapping("/employees-with-owners")
-    public ResponseEntity<List<EmployeeWithOwnersDTO>> getAllEmployeesWithOwners() {
-        List<EmployeeWithOwnersDTO> employeesWithOwners = employeeOwnerService.getAllEmployeesWithOwners();
-        return ResponseEntity.ok(employeesWithOwners);
-    }
+//    @Autowired
+//    private EmployeeOwnerService employeeOwnerService;
+//
+//    @PostMapping("/employees/{employeeId}/owners/{ownerId}/assign")
+//    public String assignEmployeeToOwner(@PathVariable Long employeeId, @PathVariable Long ownerId) {
+//        employeeOwnerService.assignEmployeeToOwner(employeeId, ownerId);
+//        return "Employee assigned to Owner successfully!";
+//    }
+//
+//    @GetMapping("/owners-with-employees")
+//    public ResponseEntity<List<OwnerWithEmployeesDTO>> getAllOwnersWithEmployees() {
+//        List<OwnerWithEmployeesDTO> ownersWithEmployees = employeeOwnerService.getAllOwnersWithEmployees();
+//        return ResponseEntity.ok(ownersWithEmployees);
+//    }
+//
+//    @GetMapping("/employees-with-owners")
+//    public ResponseEntity<List<EmployeeWithOwnersDTO>> getAllEmployeesWithOwners() {
+//        List<EmployeeWithOwnersDTO> employeesWithOwners = employeeOwnerService.getAllEmployeesWithOwners();
+//        return ResponseEntity.ok(employeesWithOwners);
+//    }
 }

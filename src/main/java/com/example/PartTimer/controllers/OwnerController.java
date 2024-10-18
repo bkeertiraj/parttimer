@@ -11,17 +11,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/owner")
 public class OwnerController {
-
-    @Autowired
-    private OwnerService ownerService;
-
-    @PostMapping("/add")
-    public Owner addEmployee(@RequestBody Owner owner) {
-        return ownerService.saveOwner(owner);
-    }
-
-    @GetMapping("/get")
-    public List<OwnerDTO> getAllOwners() {
-        return ownerService.getOwners();
-    }
+//
+//    @Autowired
+//    private OwnerService ownerService;
+//
+//    @PostMapping("/add")
+//    public Owner addEmployee(@RequestBody Owner owner) {
+//        return ownerService.saveOwner(owner);
+//    }
+//
+//    @GetMapping("/get")
+//    public List<OwnerDTO> getAllOwners() {
+//        return ownerService.getOwners();
+//    }
 }
