@@ -72,5 +72,18 @@ public class User { //renaming the class to User from Employee
     private Set<Service> services = new HashSet<>();
 
     // removed fields: designation, status, isAdmin, roleType, owners
+
+    public String getFullName() {
+        StringBuilder fullName = new StringBuilder(firstName);
+        if(middleName!=null && !middleName.isEmpty()) {
+            fullName.append(" ").append(middleName);
+        }
+        fullName.append(" ").append(lastName);
+        return fullName.toString();
+    }
+
+    public boolean isCoOwner() {
+        return UserRole.CO_OWNER.equals(this.userRole);
+    }
 }
 

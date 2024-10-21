@@ -1,15 +1,13 @@
 package com.example.PartTimer.dto;
 
 import com.example.PartTimer.entities.PaymentStatus;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.PartTimer.entities.UserRole;
 import lombok.Data;
 
-import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import com.example.PartTimer.entities.ServiceRequestStatus;
 
 @Data
 public class ServiceRequestDTO {
@@ -28,12 +26,50 @@ public class ServiceRequestDTO {
     private LocalDate date;
     private LocalTime time;
     private PaymentStatus paymentStatus;
+    private String fullName;
+    private UserRole role;
 
     private List<OrganizationDTO> availableOrganizations;
-
-    private List<String> ownerNames;
-    private List<String> coOwnerNames;
+////
+    private String organizationOwnerName = "";
+    private List<String> organizationCoOwnerNames = new ArrayList<>();;
 
 //    @JsonProperty("status")
 //    private String frontendStatus;
+
+    private List<EmployeeDTO> employeesInvolved; // New field for service providers
+
+    // Add setter method for employees
+//    public void setEmployeesInvolved(List<String> employees) {
+//        this.employeesInvolved = employees;
+//    }
+
+//    public void setAvailableOrganizations(List<OrganizationDTO> availableOrganizations) {
+//    }
+
+    // Add getters and setters
+    public String getOrganizationOwnerName() {
+        return organizationOwnerName;
+    }
+
+    public void setOrganizationOwnerName(String organizationOwnerName) {
+        this.organizationOwnerName = organizationOwnerName;
+    }
+
+    public List<String> getOrganizationCoOwnerNames() {
+        return organizationCoOwnerNames;
+    }
+
+    public void setOrganizationCoOwnerNames(List<String> organizationCoOwnerNames) {
+        this.organizationCoOwnerNames = organizationCoOwnerNames;
+    }
+
+
+    public List<EmployeeDTO> getEmployeesInvolved() {
+        return employeesInvolved;
+    }
+
+    public void setEmployeesInvolved(List<EmployeeDTO> employeesInvolved) {
+        this.employeesInvolved = employeesInvolved;
+    }
 }

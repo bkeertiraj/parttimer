@@ -44,7 +44,7 @@ public class Organization {
     private Set<Service> offeredServices = new HashSet<>();
 
     //new addition for expected fee field in organization_services
-    @OneToMany(mappedBy = "organization")
+    @OneToMany(mappedBy = "organization", fetch = FetchType.EAGER)
     private Set<OrganizationService> organizationServices = new HashSet<>();
 
 }

@@ -42,7 +42,7 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status = BookingStatus.POSTED;
+    private BookingStatus status = BookingStatus.POSTED; //PENDING
 
     @ManyToMany
     @JoinTable(

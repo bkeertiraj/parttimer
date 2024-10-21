@@ -1,7 +1,19 @@
 package com.example.PartTimer.entities;
 
 public enum BookingStatus {
-    PENDING,
+    POSTED,
+    REQUEST_SENT,
     CONFIRMED,
-    REQUEST_SENT, COMPLETED, INITIATED, PAYMENT_PENDING, POSTED, PAYMENT_SUBMITTED
+    INITIATED,
+    PAYMENT_PENDING,
+    PAYMENT_SUBMITTED,
+    COMPLETED;
+
+    public static BookingStatus fromFrontendStatus(String status) {
+        return valueOf(status.toUpperCase().replace(' ', '_'));
+    }
+
+    public String toFrontendStatus() {
+        return this.name().toLowerCase().replace('_', ' ');
+    }
 }
