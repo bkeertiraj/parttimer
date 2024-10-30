@@ -28,4 +28,7 @@ public class OrganizationService {
 
     @Column(name = "expected_fee", nullable = false) //
     private Double expectedFee;
+
+    @Column(name = "is_enabled")
+    private boolean isEnabled = true;
 }
