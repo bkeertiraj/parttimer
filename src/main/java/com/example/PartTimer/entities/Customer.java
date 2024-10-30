@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Customer {
+public class Customer { //no more in use
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;

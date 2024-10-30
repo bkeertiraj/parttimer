@@ -24,4 +24,9 @@ public class ServiceAssignment {
 
     @Column(nullable = false)
     private Double agreedPrice; // Price agreed with the organization
+
+    @Column(nullable = true) // make nullable true if it may not be set initially
+    private Double prevPrice; // Previous price before the agreed price
+
+
 }

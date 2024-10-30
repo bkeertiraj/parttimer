@@ -55,9 +55,12 @@ public class ServiceRequestController {
 //
 
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<ServiceRequestDTO> confirmServiceRequest(@PathVariable Long id, @RequestBody List<Long> assignedEmployeeIds) { //
+    public ResponseEntity<ServiceRequestDTO> confirmServiceRequest(
+            @PathVariable Long id,
+            @RequestBody List<Long> assignedEmployeeIds) { //
         // Call the service to confirm the service request
         System.out.println("Inside confirm service request, next is initiate service request");
+        System.out.println("Received Employee IDs: " + assignedEmployeeIds);
         ServiceRequestDTO updatedRequest = serviceRequestService.confirmAndAssignEmployees(id, assignedEmployeeIds);
         return ResponseEntity.ok(updatedRequest);
     }
@@ -66,7 +69,7 @@ public class ServiceRequestController {
     @PostMapping("/{id}/initiate")
     public ResponseEntity<ServiceRequestDTO> initiateServiceRequest(@PathVariable Long id) {
         // Call the service to confirm initiating the service request
-        System.out.println("Inside confirm service request, next is to finish service request");
+        System.out.println("Inside initiate service request, next is to finish service request");
         //serviceRequestService.updateStatus(id, "INITIATED");
         return ResponseEntity.ok(serviceRequestService.updateStatus(id, "INITIATED"));
     }
@@ -75,7 +78,7 @@ public class ServiceRequestController {
     @PostMapping("/{id}/finish")
     public ResponseEntity<ServiceRequestDTO> finishServiceRequest(@PathVariable Long id) {
         // Call the service to confirm to finish the service request
-        System.out.println("Inside confirm service request, next is simulate payment");
+        System.out.println("Inside finish service request, next is simulate payment");
         //serviceRequestService.updateStatus(id, "INITIATED");
         return ResponseEntity.ok(serviceRequestService.updateStatus(id, "PAYMENT_PENDING"));
     }
@@ -96,7 +99,6 @@ public class ServiceRequestController {
     //verify the payment
     @PostMapping("/{id}/verify")
     public ResponseEntity<ServiceRequestDTO> verifyPayment(@PathVariable Long id) {
-        // Call the service to confirm to finish the service request
         System.out.println("Inside verify payment, next is feedback");
         //serviceRequestService.updateStatus(id, "INITIATED");
         return ResponseEntity.ok(serviceRequestService.updateStatus(id, "COMPLETED"));

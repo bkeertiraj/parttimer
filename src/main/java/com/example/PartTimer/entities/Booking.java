@@ -63,5 +63,11 @@ public class Booking {
     private String feedback;
 
 
+    //new one on 28-10-2024
+    @OneToOne(mappedBy = "booking")
+    private BookingAssignment bookingAssignment;
 
+    //29-10-2024
+    @Column(nullable = true)
+    private String address;
 }

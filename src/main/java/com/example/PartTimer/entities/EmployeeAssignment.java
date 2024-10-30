@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class EmployeeAssignment {
+public class EmployeeAssignment { //no more in use
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

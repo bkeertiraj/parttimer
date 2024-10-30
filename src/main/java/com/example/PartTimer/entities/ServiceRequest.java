@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Entity
 @Data
-public class ServiceRequest {
+public class ServiceRequest { //not in use
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

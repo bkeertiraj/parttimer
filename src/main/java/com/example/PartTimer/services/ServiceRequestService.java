@@ -1,14 +1,8 @@
 package com.example.PartTimer.services;
 
-import com.example.PartTimer.dto.FeedbackDTO;
-import com.example.PartTimer.dto.OrganizationDTO;
-import com.example.PartTimer.dto.PaymentSimulationDTO;
-import com.example.PartTimer.dto.ServiceRequestDTO;
+import com.example.PartTimer.dto.*;
 import com.example.PartTimer.entities.*;
-import com.example.PartTimer.repositories.BookingRepository;
-import com.example.PartTimer.repositories.OrganizationRepository;
-import com.example.PartTimer.repositories.OrganizationServiceRepository;
-import com.example.PartTimer.repositories.ServiceAssignmentRepository;
+import com.example.PartTimer.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,16 +24,20 @@ public class ServiceRequestService {
     private final ServiceAssignmentRepository serviceAssignmentRepository;
     private final OrganizationRepository organizationRepository;
     private final OrganizationServiceRepository organizationServiceRepository;
+    private final UserRepository userRepository;
+    private final BookingAssignmentRepository bookingAssignmentRepository;
 
     @Autowired
-    public ServiceRequestService(
-            BookingRepository bookingRepository,
-            ServiceAssignmentRepository serviceAssignmentRepository,
-            OrganizationRepository organizationRepository, OrganizationServiceRepository organizationServiceRepository) {
+    public ServiceRequestService(UserRepository userRepository,
+                                 BookingRepository bookingRepository,
+                                 ServiceAssignmentRepository serviceAssignmentRepository,
+                                 OrganizationRepository organizationRepository, OrganizationServiceRepository organizationServiceRepository, BookingAssignmentRepository bookingAssignmentRepository) {
         this.bookingRepository = bookingRepository;
         this.serviceAssignmentRepository = serviceAssignmentRepository;
         this.organizationRepository = organizationRepository;
         this.organizationServiceRepository = organizationServiceRepository;
+        this.userRepository = userRepository;
+        this.bookingAssignmentRepository = bookingAssignmentRepository;
     }
 
     public ServiceRequestDTO getServiceRequestDetails(Long id) {
@@ -64,6 +63,17 @@ public class ServiceRequestService {
             dto.setOrganizationId(assignment.getOrganization().getId());
             dto.setOrganizationName(assignment.getOrganization().getName());
             dto.setAgreedPrice(assignment.getAgreedPrice());
+
+            BookingAssignment bookingAssignment = bookingAssignmentRepository
+                    .findByBookingBookingId(booking.getBookingId())
+                    .orElse(null);
+            if (bookingAssignment != null && bookingAssignment.getAssignedEmployees() != null) {
+                List<EmployeeDTO> employeesInvolved = bookingAssignment.getAssignedEmployees().stream()
+                        .map(this::mapToEmployeeDTO)
+                        .collect(Collectors.toList());
+                dto.setEmployeesInvolved(employeesInvolved);
+            }
+
         }
         else {
             // If no organization is assigned, fetch organizations offering the booked service
@@ -111,7 +121,7 @@ public class ServiceRequestService {
         serviceAssignmentRepository.save(assignment);
 
         // Update booking status
-        booking.setStatus(BookingStatus.CONFIRMED); //
+        booking.setStatus(BookingStatus.REQUEST_SENT); // CONFIRMED
         bookingRepository.save(booking);
 
         return getServiceRequestDetails(bookingId);
@@ -131,6 +141,7 @@ public class ServiceRequestService {
         // Update payment status
 //        booking.setPaymentStatus(PaymentStatus.COMPLETED);
         booking.setStatus(BookingStatus.REQUEST_SENT);
+        booking.setPaymentStatus(PaymentStatus.COMPLETED);
         bookingRepository.save(booking);
 
         return getServiceRequestDetails(id);
@@ -152,7 +163,7 @@ public class ServiceRequestService {
         bookingRepository.save(booking);
 
         // Retrieve the service assignment based on the booking
-        ServiceAssignment serviceAssignment = serviceAssignmentRepository.findById(booking.getBookingId())
+        ServiceAssignment serviceAssignment = serviceAssignmentRepository.findByBooking(booking)
                 .orElseThrow(() -> new RuntimeException("Service assignment not found for booking ID: " + booking.getBookingId()));
 
         // Get the assigned organization
@@ -170,9 +181,9 @@ public class ServiceRequestService {
                 .collect(Collectors.toList());
 
         // Create and populate the DTO with owners and co-owners
-        ServiceRequestDTO serviceRequestDTO = mapToServiceRequestDTO(booking);
-        serviceRequestDTO.setOwnerNames(ownerNames);
-        serviceRequestDTO.setCoOwnerNames(coOwnerNames);
+//        ServiceRequestDTO serviceRequestDTO = mapToServiceRequestDTO(booking);
+//        serviceRequestDTO.setOwnerNames(ownerNames);
+//        serviceRequestDTO.setCoOwnerNames(coOwnerNames);
 
         // Return the updated DTO after mapping
         return mapToServiceRequestDTO(booking);
@@ -195,10 +206,23 @@ public class ServiceRequestService {
 
         // If service assignment exists, include organization and price
         ServiceAssignment assignment = serviceAssignmentRepository.findByBooking(booking).orElse(null);
+
+        BookingAssignment bookingAssignment = bookingAssignmentRepository
+                .findByBookingBookingId(booking.getBookingId())
+                .orElse(null);
+
         if (assignment != null) {
             dto.setOrganizationId(assignment.getOrganization().getId());
             dto.setOrganizationName(assignment.getOrganization().getName());
             dto.setAgreedPrice(assignment.getAgreedPrice());
+
+            // If booking assignment exists, set the employees involved
+            if (bookingAssignment != null && bookingAssignment.getAssignedEmployees() != null) {
+                List<EmployeeDTO> employeesInvolved = bookingAssignment.getAssignedEmployees().stream()
+                        .map(this::mapToEmployeeDTO)
+                        .collect(Collectors.toList());
+                dto.setEmployeesInvolved(employeesInvolved);
+            }
         }
 
         // Comments, Rating, and Feedback
@@ -206,6 +230,8 @@ public class ServiceRequestService {
         dto.setRating(booking.getRating());
         dto.setFeedback(booking.getFeedback());
 
+        dto.setFullName(booking.getUser().getFullName());
+        dto.setRole(booking.getUser().getUserRole());
         return dto;
     }
 
@@ -237,4 +263,85 @@ public class ServiceRequestService {
         return mapToServiceRequestDTO(booking);
     }
 
+    public ServiceRequestDTO confirmAndAssignEmployees(Long id, List<Long> assignedEmployeeIds) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        List<User> assignedEmployees = userRepository.findAllById(assignedEmployeeIds);
+
+        //new code from here
+        ServiceAssignment serviceAssignment = serviceAssignmentRepository.findByBooking(booking).orElse(null);
+
+        BookingAssignment bookingAssignment = new BookingAssignment();
+        bookingAssignment.setBooking(booking);
+        bookingAssignment.setOrganization(serviceAssignment.getOrganization());
+        bookingAssignment.setAgreedPrice(serviceAssignment.getAgreedPrice());
+        bookingAssignment.setAssignedEmployees(new HashSet<>(assignedEmployees));
+
+        bookingAssignment = bookingAssignmentRepository.save(bookingAssignment);
+//
+        List<EmployeeDTO> employeesInvolved = assignedEmployees.stream()
+                .map(this::mapToEmployeeDTO)
+                .collect(Collectors.toList());
+        ServiceRequestDTO dto = new ServiceRequestDTO();
+        dto.setEmployeesInvolved(employeesInvolved);
+//
+        return mapToDTO(booking, bookingAssignment);
+
+//        // Print the names of the assigned employees
+//        assignedEmployees.forEach(employee -> {
+//            System.out.println("Assigned Employee: " + employee.getFullName());
+//            // You can use a logger instead of System.out.println
+//            // log.debug("Assigned Employee: {} {}", employee.getFirstName(), employee.getLastName());
+//        });
+//
+//        booking.setServiceProviders(new HashSet<>(assignedEmployees));
+//
+//        booking = bookingRepository.save(booking);
+//
+//        ServiceRequestDTO dto = mapToDTO(booking);
+//
+//        List<EmployeeDTO> employeesInvolved = assignedEmployees.stream()
+//                .map(this::mapToEmployeeDTO)
+//                .collect(Collectors.toList());
+//
+//        dto.setEmployeesInvolved(employeesInvolved);
+//
+//        return dto;
+    }
+    private EmployeeDTO mapToEmployeeDTO(User user) {
+        return new EmployeeDTO(
+                user.getUserId(),
+                user.getFullName(),
+                user.getUserRole()
+        );
+    }
+
+    private ServiceRequestDTO mapToDTO(Booking booking, BookingAssignment bookingAssignment) {
+        ServiceRequestDTO dto = new ServiceRequestDTO();
+        dto.setId(booking.getBookingId());
+        dto.setUserId(booking.getUser().getUserId());
+        dto.setServiceId(booking.getService().getServiceId());
+        dto.setStatus(booking.getStatus().toString());
+        dto.setAddress(booking.getLocation());
+        dto.setOrganizationId(bookingAssignment.getOrganization().getId());
+        dto.setOrganizationName(bookingAssignment.getOrganization().getName());
+        dto.setAgreedPrice(bookingAssignment.getAgreedPrice());
+        dto.setComments(booking.getDescription());
+        dto.setRating(booking.getRating());
+        dto.setFeedback(booking.getFeedback());
+        dto.setDate(LocalDate.parse(booking.getDate()));
+        dto.setTime(LocalTime.parse(booking.getTime()));
+        dto.setPaymentStatus(booking.getPaymentStatus());
+        dto.setFullName(booking.getUser().getFullName());
+        dto.setRole(booking.getUser().getUserRole());
+
+        List<EmployeeDTO> employeesInvolved = bookingAssignment.getAssignedEmployees().stream()
+                .map(this::mapToEmployeeDTO)
+                .collect(Collectors.toList());
+        dto.setEmployeesInvolved(employeesInvolved);
+
+        return dto;
+    }
 }
