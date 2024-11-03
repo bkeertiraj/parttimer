@@ -18,4 +18,6 @@ public interface BookingAssignmentRepository extends JpaRepository<BookingAssign
     @Query("SELECT ba FROM BookingAssignment ba WHERE ba.booking.bookingId = :bookingId")
     Optional<BookingAssignment> findByBookingId(@Param("bookingId") Long bookingId);
 
+    Optional<BookingAssignment> findByBooking_BookingIdAndOrganization_Id(Long bookingId, Long organizationId);
+
 }
