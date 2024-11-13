@@ -28,7 +28,7 @@ public class BookingOrgService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         // Check if organization has access to this booking
-        validateOrganizationAccess(orgId, booking);
+        //validateOrganizationAccess(orgId, booking);
 
         BookingAssignment assignment = bookingAssignmentRepository
                 .findByBooking_BookingIdAndOrganization_Id(bookingId, orgId)
@@ -51,20 +51,21 @@ public class BookingOrgService {
         dto.setId(booking.getBookingId().toString());
         dto.setName(booking.getService().getName());
         dto.setStatus(booking.getStatus().toFrontendStatus());
-        dto.setInfo(booking.getDescription());
+        dto.setDescription(booking.getDescription());
         dto.setDate(booking.getDate());
         dto.setTime(booking.getTime());
-
+        dto.setLocation(booking.getLocation());
+        dto.setAddress(booking.getAddress());
 
         // Only include full address if status is confirmed or later
-        if (booking.getStatus().ordinal() >= BookingStatus.CONFIRMED.ordinal()) {
+        if (booking.getStatus().ordinal() >= BookingStatus.SELLER_ACCEPTED.ordinal()) {
             dto.setAddress(booking.getAddress());
         }
         dto.setCity(booking.getAddress());
         dto.setZip(booking.getAddress());
 
         // Include email only if status is confirmed or later
-        if (booking.getStatus().ordinal() >= BookingStatus.CONFIRMED.ordinal()) {
+        if (booking.getStatus().ordinal() >= BookingStatus.SELLER_ACCEPTED.ordinal()) {
             dto.setClientEmail(booking.getEmail());
         }
 

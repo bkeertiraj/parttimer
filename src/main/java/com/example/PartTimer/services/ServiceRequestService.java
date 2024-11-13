@@ -7,9 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -121,7 +119,7 @@ public class ServiceRequestService {
         serviceAssignmentRepository.save(assignment);
 
         // Update booking status
-        booking.setStatus(BookingStatus.REQUEST_SENT); // CONFIRMED
+        booking.setStatus(BookingStatus.SELLER_SELECTED);
         bookingRepository.save(booking);
 
         return getServiceRequestDetails(bookingId);
@@ -140,7 +138,7 @@ public class ServiceRequestService {
 
         // Update payment status
 //        booking.setPaymentStatus(PaymentStatus.COMPLETED);
-        booking.setStatus(BookingStatus.REQUEST_SENT);
+        booking.setStatus(BookingStatus.SELLER_SELECTED);
         booking.setPaymentStatus(PaymentStatus.COMPLETED);
         bookingRepository.save(booking);
 
@@ -242,7 +240,7 @@ public class ServiceRequestService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         // Update the booking status to "confirmed" or whatever status you want to set
-        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStatus(BookingStatus.SELLER_ACCEPTED);
         bookingRepository.save(booking); // Persist the change
 
         // Return the updated ServiceRequestDTO
@@ -267,7 +265,7 @@ public class ServiceRequestService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStatus(BookingStatus.SELLER_ACCEPTED);
         List<User> assignedEmployees = userRepository.findAllById(assignedEmployeeIds);
 
         //new code from here

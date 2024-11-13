@@ -60,9 +60,9 @@ public class ServiceDeliveryService {
 
         //progress
         int progress = switch (booking.getStatus()) {
-            case POSTED -> 0;
-            case REQUEST_SENT -> 20;
-            case CONFIRMED -> 40;
+            case OPEN -> 0;
+            case SELLER_SELECTED -> 20;
+            case SELLER_ACCEPTED -> 40;
             case INITIATED -> 60;
             case PAYMENT_PENDING -> 80;
             case PAYMENT_SUBMITTED -> 90;

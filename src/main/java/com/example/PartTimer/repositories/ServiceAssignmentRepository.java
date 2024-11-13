@@ -14,4 +14,6 @@ public interface ServiceAssignmentRepository extends JpaRepository<ServiceAssign
 
     List<ServiceAssignment> findByOrganizationId(Long orgId);
 
+    Optional<ServiceAssignment> findByBooking_BookingIdAndOrganization_Id(Long bookingId, Long organizationId);
+
 }

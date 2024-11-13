@@ -42,7 +42,7 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status = BookingStatus.POSTED; //PENDING
+    private BookingStatus status = BookingStatus.OPEN; //PENDING
 
     @ManyToMany
     @JoinTable(
@@ -70,4 +70,10 @@ public class Booking {
     //29-10-2024
     @Column(nullable = true)
     private String address;
+
+    @Column
+    private Integer userRating;
+
+    @Column
+    private String userFeedback;
 }

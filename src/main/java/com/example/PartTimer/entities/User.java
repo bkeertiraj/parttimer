@@ -42,6 +42,7 @@ public class User { //renaming the class to User from Employee
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password; //new password field
 
@@ -57,6 +58,7 @@ public class User { //renaming the class to User from Employee
 
     @ManyToOne
     @JoinColumn(name = "organization_id")
+    @JsonIgnore
     private Organization organization;
 
     @CreationTimestamp
@@ -64,6 +66,7 @@ public class User { //renaming the class to User from Employee
     private LocalDate joinDate;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_service",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -11,7 +11,7 @@ public class BookingDetailsDTO {
     private String id;
     private String name;
     private String status;
-    private String info;
+    private String description;
     private String date;
     private String time;
     private String address;
@@ -22,4 +22,6 @@ public class BookingDetailsDTO {
     private Double agreedPrice;
     private Set<User> assignedEmployees;
     private List<String> pastOfferedPrices;
+
+    private String location;
 }

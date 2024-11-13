@@ -46,9 +46,9 @@ public class ServiceManagementService {
 
                     // Calculate counts
                     dto.setPendingCount(countBookingsByStatus(bookings,
-                            BookingStatus.POSTED, BookingStatus.REQUEST_SENT));
+                            BookingStatus.OPEN, BookingStatus.SELLER_SELECTED));
                     dto.setOngoingCount(countBookingsByStatus(bookings,
-                            BookingStatus.CONFIRMED, BookingStatus.INITIATED, BookingStatus.PAYMENT_PENDING));
+                            BookingStatus.SELLER_ACCEPTED, BookingStatus.INITIATED, BookingStatus.PAYMENT_PENDING));
                     dto.setCompletedCount(countBookingsByStatus(bookings,
                             BookingStatus.COMPLETED));
 

@@ -37,7 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN OrganizationService os ON os.service = b.service " +
             "WHERE os.organization.id = :orgId " +
             "AND (sa.organization.id = :orgId OR " +
-            "(b.status = com.example.PartTimer.entities.BookingStatus.POSTED " +
+            "(b.status = com.example.PartTimer.entities.BookingStatus.OPEN " +
             "AND sa.organization IS NULL)) " +
             "ORDER BY b.bookingId DESC")
     List<Booking> findLatestAndPostedBookings(@Param("orgId") Long orgId, Pageable pageable);
@@ -46,7 +46,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT DISTINCT b FROM Booking b " +
             "JOIN OrganizationService os ON os.service = b.service " +
             "WHERE os.organization.id = :orgId " +
-            "AND b.status = com.example.PartTimer.entities.BookingStatus.POSTED " +
+            "AND b.status = com.example.PartTimer.entities.BookingStatus.OPEN " +
             "AND NOT EXISTS (SELECT 1 FROM ServiceAssignment sa WHERE sa.booking = b) " +
             "ORDER BY b.bookingId DESC")
     List<Booking> findNewlyPostedBookings(@Param("orgId") Long orgId);
