@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface OrganizationServiceRepository extends JpaRepository<OrganizationService, Long> {
 
-    @Query("SELECT os FROM OrganizationService os WHERE os.service.id = :serviceId")
+    @Query("SELECT os FROM OrganizationService os WHERE os.service.serviceId = :serviceId") //os.service.id
     List<OrganizationService> findOrganizationsByServiceId(@Param("serviceId") Long serviceId);
 
     long countByOrganizationId(Long orgId);

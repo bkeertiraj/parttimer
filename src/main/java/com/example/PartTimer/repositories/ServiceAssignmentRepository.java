@@ -10,10 +10,11 @@ import java.util.Optional;
 public interface ServiceAssignmentRepository extends JpaRepository<ServiceAssignment, Long> {
 
     // Method to find the assignment by booking
-    Optional<ServiceAssignment> findByBooking(Booking booking);
+    Optional<ServiceAssignment> findByBooking(Booking booking); //Optional<ServiceAssignment>
 
     List<ServiceAssignment> findByOrganizationId(Long orgId);
 
     Optional<ServiceAssignment> findByBooking_BookingIdAndOrganization_Id(Long bookingId, Long organizationId);
 
+    List<ServiceAssignment> findFirstByBookingOrderByIdDesc(Booking booking);
 }

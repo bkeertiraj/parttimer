@@ -90,7 +90,7 @@ public class ServiceRequestService {
             OrganizationDTO dto = new OrganizationDTO();
             dto.setId(orgService.getOrganization().getId());
             dto.setName(orgService.getOrganization().getName());
-            dto.setExpectedFee(orgService.getExpectedFee()); // Set the expected fee
+            dto.setExpectedFee(orgService.getExpectedFee()); // Set the expected fee, i think it should be the offered price
             organizationDTOs.add(dto);
         }
 
@@ -104,18 +104,23 @@ public class ServiceRequestService {
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
 
         // Create service assignment
-        ServiceAssignment assignment = new ServiceAssignment();
-        assignment.setBooking(booking);
-        assignment.setOrganization(organization);
+//        ServiceAssignment assignment = new ServiceAssignment();
+//        assignment.setBooking(booking);
+//        assignment.setOrganization(organization);
+
+        ServiceAssignment assignment = serviceAssignmentRepository
+                .findByBooking_BookingIdAndOrganization_Id(bookingId, organizationId)
+                .orElseThrow(() -> new RuntimeException("No price offer found from this organization"));;
 
         // Get expected fee from OrganizationService
-        Double agreedPrice = organization.getOrganizationServices().stream()
-                .filter(os -> os.getService().equals(booking.getService()))
-                .findFirst()
-                .map(OrganizationService::getExpectedFee)
-                .orElse(booking.getService().getBaseFee());
+//        Double agreedPrice = organization.getOrganizationServices().stream()
+//                .filter(os -> os.getService().equals(booking.getService()))
+//                .findFirst()
+//                .map(OrganizationService::getExpectedFee)
+//                .orElse(booking.getService().getBaseFee());
 
-        assignment.setAgreedPrice(agreedPrice);
+//        assignment.setAgreedPrice(agreedPrice);
+        assignment.setAgreedPrice(assignment.getOfferedPrice());
         serviceAssignmentRepository.save(assignment);
 
         // Update booking status

@@ -23,10 +23,11 @@ public class ServiceAssignment {
     private Organization organization; // Organization that picked up the booking
 
     @Column(nullable = false)
-    private Double agreedPrice; // Price agreed with the organization
+    private Double agreedPrice = 0.0; // Price agreed with the organization
 
     @Column(nullable = true) // make nullable true if it may not be set initially
     private Double prevPrice; // Previous price before the agreed price, WILL BE CHANGED THIS FROM HERE
 
-
+    @Column(nullable = false)
+    private Double offeredPrice; // Price offered by organization
 }

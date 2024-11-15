@@ -131,12 +131,13 @@ public class ServiceAssignmentService {
 
         serviceAssignment.setBooking(booking);
         serviceAssignment.setOrganization(organization);
-        serviceAssignment.setAgreedPrice(offeredPrice);
+        //serviceAssignment.setAgreedPrice(offeredPrice);
+        serviceAssignment.setOfferedPrice(offeredPrice);
 
         serviceAssignment = serviceAssignmentRepository.save(serviceAssignment);
 
         // Update booking status to REQUEST_SENT
-        booking.setStatus(BookingStatus.SELLER_SELECTED);
+        //booking.setStatus(BookingStatus.SELLER_SELECTED);
         bookingRepository.save(booking);
 
         return mapToServiceAssignmentDTO(serviceAssignment);
