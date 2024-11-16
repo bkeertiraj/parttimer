@@ -7,6 +7,7 @@ public class OrganizationDTO {
     private Long id;
     private String name;
     private Double expectedFee;
+    private boolean hasOfferedPrice;
 
     public OrganizationDTO(Long id, String name) {
         this.id = id;

@@ -16,5 +16,10 @@ public interface ServiceAssignmentRepository extends JpaRepository<ServiceAssign
 
     Optional<ServiceAssignment> findByBooking_BookingIdAndOrganization_Id(Long bookingId, Long organizationId);
 
-    List<ServiceAssignment> findFirstByBookingOrderByIdDesc(Booking booking);
+    //15-11-2024
+    // Add new method to find all assignments for a booking
+    List<ServiceAssignment> findAllByBooking(Booking booking);
+
+    // Add method to find the accepted/final assignment
+    Optional<ServiceAssignment> findByBookingAndAgreedPriceGreaterThan(Booking booking, Double price);
 }

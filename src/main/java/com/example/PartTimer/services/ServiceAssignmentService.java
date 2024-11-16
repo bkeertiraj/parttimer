@@ -134,6 +134,10 @@ public class ServiceAssignmentService {
         //serviceAssignment.setAgreedPrice(offeredPrice);
         serviceAssignment.setOfferedPrice(offeredPrice);
 
+        // Set the offer date and time (15-11-2024)
+        serviceAssignment.setOfferDate(LocalDate.now());
+        serviceAssignment.setOfferTime(LocalTime.now());
+
         serviceAssignment = serviceAssignmentRepository.save(serviceAssignment);
 
         // Update booking status to REQUEST_SENT

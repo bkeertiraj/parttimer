@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,14 +54,43 @@ public class ServiceRequestService {
         dto.setTime(LocalTime.parse(booking.getTime()));
         dto.setPaymentStatus(PaymentStatus.valueOf(booking.getPaymentStatus().toString()));
 
-        // Check if the service is already assigned to an organization
-        ServiceAssignment assignment = serviceAssignmentRepository.findByBooking(booking)
+//        // Check if the service is already assigned to an organization
+//        ServiceAssignment assignment = serviceAssignmentRepository.findByBooking(booking)
+//                .orElse(null);
+//
+//        if (assignment != null) {
+//            dto.setOrganizationId(assignment.getOrganization().getId());
+//            dto.setOrganizationName(assignment.getOrganization().getName());
+//            dto.setAgreedPrice(assignment.getAgreedPrice());
+//
+//            BookingAssignment bookingAssignment = bookingAssignmentRepository
+//                    .findByBookingBookingId(booking.getBookingId())
+//                    .orElse(null);
+//            if (bookingAssignment != null && bookingAssignment.getAssignedEmployees() != null) {
+//                List<EmployeeDTO> employeesInvolved = bookingAssignment.getAssignedEmployees().stream()
+//                        .map(this::mapToEmployeeDTO)
+//                        .collect(Collectors.toList());
+//                dto.setEmployeesInvolved(employeesInvolved);
+//            }
+//
+//        }
+//        else {
+//            // If no organization is assigned, fetch organizations offering the booked service
+//            List<OrganizationDTO> availableOrganizations = getAvailableOrganizationsForService(booking.getService().getServiceId());
+//            dto.setAvailableOrganizations(availableOrganizations);
+//        }
+//        return dto;
+
+        // First try to find an accepted assignment (with agreed price)
+        ServiceAssignment finalAssignment = serviceAssignmentRepository
+                .findByBookingAndAgreedPriceGreaterThan(booking, 0.0)
                 .orElse(null);
 
-        if (assignment != null) {
-            dto.setOrganizationId(assignment.getOrganization().getId());
-            dto.setOrganizationName(assignment.getOrganization().getName());
-            dto.setAgreedPrice(assignment.getAgreedPrice());
+        if (finalAssignment != null) {
+            // Handle accepted assignment case
+            dto.setOrganizationId(finalAssignment.getOrganization().getId());
+            dto.setOrganizationName(finalAssignment.getOrganization().getName());
+            dto.setAgreedPrice(finalAssignment.getAgreedPrice());
 
             BookingAssignment bookingAssignment = bookingAssignmentRepository
                     .findByBookingBookingId(booking.getBookingId())
@@ -71,17 +101,50 @@ public class ServiceRequestService {
                         .collect(Collectors.toList());
                 dto.setEmployeesInvolved(employeesInvolved);
             }
-
-        }
-        else {
-            // If no organization is assigned, fetch organizations offering the booked service
-            List<OrganizationDTO> availableOrganizations = getAvailableOrganizationsForService(booking.getService().getServiceId());
+        } else {
+            // If no final assignment, get all organizations that have made offers
+            List<OrganizationDTO> availableOrganizations = getAvailableOrganizationsWithOffers(booking);
             dto.setAvailableOrganizations(availableOrganizations);
         }
         return dto;
     }
 
-    private List<OrganizationDTO> getAvailableOrganizationsForService(Long serviceId) {
+    private List<OrganizationDTO> getAvailableOrganizationsWithOffers(Booking booking) {
+        // Get all service assignments for this booking
+        List<ServiceAssignment> assignments = serviceAssignmentRepository.findAllByBooking(booking);
+
+        // Get all organizations offering this service
+        List<OrganizationService> organizationServices = organizationServiceRepository
+                .findOrganizationsByServiceId(booking.getService().getServiceId());
+
+        List<OrganizationDTO> organizationDTOs = new ArrayList<>();
+
+        // Create a map of organization ID to their offered price from assignments
+        Map<Long, Double> orgOfferedPrices = assignments.stream()
+                .collect(Collectors.toMap(
+                        sa -> sa.getOrganization().getId(),
+                        ServiceAssignment::getOfferedPrice
+                ));
+        for (OrganizationService orgService : organizationServices) {
+            Organization org = orgService.getOrganization();
+            OrganizationDTO dto = new OrganizationDTO();
+            dto.setId(org.getId());
+            dto.setName(org.getName());
+
+            // Use offered price if available, otherwise use expected fee
+            Double offeredPrice = orgOfferedPrices.get(org.getId());
+            dto.setExpectedFee(offeredPrice != null ? offeredPrice : orgService.getExpectedFee());
+
+            // Add flag to indicate if this organization has made an offer
+            dto.setHasOfferedPrice(offeredPrice != null);
+
+            organizationDTOs.add(dto);
+        }
+
+        return organizationDTOs;
+    }
+
+        private List<OrganizationDTO> getAvailableOrganizationsForService(Long serviceId) {
         List<OrganizationService> organizationServices = organizationServiceRepository.findOrganizationsByServiceId(serviceId);
 
         List<OrganizationDTO> organizationDTOs = new ArrayList<>();
@@ -121,6 +184,7 @@ public class ServiceRequestService {
 
 //        assignment.setAgreedPrice(agreedPrice);
         assignment.setAgreedPrice(assignment.getOfferedPrice());
+        System.out.println("the agreed price is: " + assignment.getOfferedPrice());
         serviceAssignmentRepository.save(assignment);
 
         // Update booking status

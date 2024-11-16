@@ -3,6 +3,9 @@ package com.example.PartTimer.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
 @Getter
 @Setter
@@ -30,4 +33,10 @@ public class ServiceAssignment {
 
     @Column(nullable = false)
     private Double offeredPrice; // Price offered by organization
+
+    @Column(nullable = false)
+    private LocalDate offerDate; // Date when the offer was made
+
+    @Column(nullable = false)
+    private LocalTime offerTime; // Time when the offer was made
 }
