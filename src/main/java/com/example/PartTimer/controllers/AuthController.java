@@ -56,7 +56,7 @@ public class AuthController {
     // Login endpoint
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> loginData) {
-        String email = loginData.get("usernameOrEmail");
+        String email = loginData.get("email");
         String password = loginData.get("password");
 
         Optional<User> user = userService.login(email, password);

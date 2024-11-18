@@ -36,8 +36,8 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                //.requestMatchers("/api/auth/**").permitAll()
-                                .anyRequest().permitAll())
+                                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                                .anyRequest().authenticated())
                 //.httpBasic(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
