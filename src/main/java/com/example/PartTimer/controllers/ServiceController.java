@@ -16,8 +16,10 @@ public class ServiceController {
     @Autowired
     private ServiceService serviceService;
 
+
     @GetMapping
     public List<Service> getAllService() {
+        System.out.println("inside getAllService");
         return serviceService.getAllServices();
     }
 //

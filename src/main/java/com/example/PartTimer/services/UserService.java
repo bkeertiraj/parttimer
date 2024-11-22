@@ -3,7 +3,11 @@ package com.example.PartTimer.services;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,7 +18,15 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+//    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
+
+    public UserService(PasswordEncoder encoder, AuthenticationManager authenticationManager) {
+        this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
+    }
 
     //sign-up
     public User signUp(User user) {
@@ -32,5 +44,35 @@ public class UserService {
             }
         }
         return Optional.empty();  // Login failed
+    }
+
+    public boolean authenticate(String email, String password) {
+//        Optional<User> userOptional = userRepository.findByEmail(email);
+//
+//        if (userOptional.isPresent()) {
+//            User user = userOptional.get();
+//
+//            // Compare the provided password with the hashed password
+//            return encoder.matches(password, user.getPassword());
+//        }
+//
+//        return false; // User not found or password doesn't match
+
+        try {
+            // This will throw an exception if authentication fails
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            password
+                    )
+            );
+            return true;
+        } catch (AuthenticationException e) {
+            return false;
+        }
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
