@@ -52,6 +52,19 @@ public class User { //renaming the class to User from Employee
     @Column(name = "address")
     private String address;  // new address field
 
+
+    @Column(name = "country") //name = "country", length = 2
+    private String country;  // Country code (e.g., US)
+
+    @Column(name = "state")
+    private String state;    // State name
+
+    @Column(name = "city")
+    private String city;     // City name
+
+    @Column(name = "zipcode")
+    private String zipcode;  // Postal/ZIP code
+
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
     private UserRole userRole = UserRole.USER; //default to USER

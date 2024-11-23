@@ -59,7 +59,12 @@ public class AuthController {
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
         user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setAddress(userDTO.getLocation());
+//        user.setAddress(userDTO.getLocation());
+
+        user.setCountry(userDTO.getCountry());
+        user.setState(userDTO.getState());
+        user.setCity(userDTO.getCity());
+        user.setZipcode(userDTO.getZipcode());
 
         System.out.println("Received signup request at /register");
         System.out.println("User data: " + user);
@@ -68,8 +73,11 @@ public class AuthController {
         System.out.println("User title: " + user.getTitle());
         System.out.println("User name: " + user.getFirstName() + user.getMiddleName() + user.getLastName());
         System.out.println("User password: " +user.getPassword() );
-        System.out.println("Address: " + user.getAddress());
-        System.out.println("Title: " + user.getTitle());
+//        System.out.println("Address: " + user.getAddress());
+        System.out.println("User country: " + user.getCountry());
+        System.out.println("User state: " + user.getState());
+        System.out.println("User city: " + user.getState());
+        System.out.println("User zipcode: " + user.getZipcode());
 
         try {
             userService.signUp(user);
@@ -92,7 +100,6 @@ public class AuthController {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
             String token = jwtService.generateToken(userDetails);
 
-
             //create HTTP-only cookie
             Cookie jwtCookie = new Cookie("jwt", token);
             jwtCookie.setHttpOnly(true); // prevents JavaScript access
@@ -101,6 +108,7 @@ public class AuthController {
             jwtCookie.setMaxAge(2 * 24 * 60 * 60); //2 days in seconds
 
             // Add cookie to response
+            System.out.println("cookie issued: " + jwtCookie.getName());
             response.addCookie(jwtCookie);
 
             return ResponseEntity.ok(Map.of("token", token));

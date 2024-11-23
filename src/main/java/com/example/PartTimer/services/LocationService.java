@@ -12,15 +12,20 @@ public class LocationService {
     @Autowired
     private UsCityRepository usCityRepository;
 
-    public List<String> getStates(String prefix) {
-        return usCityRepository.findDistinctStatesByPrefix(prefix != null ? prefix : "");
+    public List<String> getCountries(String prefix) {
+        return usCityRepository.findDistinctCountriesByPrefix(prefix != null ? prefix : "");
     }
 
-    public List<String> getCities(String state, String prefix) {
-        return usCityRepository.findDistinctCitiesByStateAndPrefix(state, prefix != null ? prefix : "");
+    public List<String> getStates(String country, String prefix) {
+        return usCityRepository.findDistinctStatesByCountryAndPrefix(country, prefix != null ? prefix : "");
     }
 
-    public List<String> getZipcodes(String state, String city, String prefix) {
-        return usCityRepository.findDistinctZipcodesByStateAndCityAndPrefix(state, city, prefix != null ? prefix : "");
+    public List<String> getCities(String country, String state, String prefix) {
+        return usCityRepository.findDistinctCitiesByCountryStateAndPrefix(country, state, prefix != null ? prefix : "");
+    }
+
+    public List<String> getZipcodes(String country, String state, String city, String prefix) {
+        return usCityRepository.findDistinctZipcodesByCountryStateAndCityAndPrefix(
+                country, state, city, prefix != null ? prefix : "");
     }
 }

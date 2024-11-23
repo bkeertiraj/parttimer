@@ -16,24 +16,33 @@ public class LocationController {
 
     @Autowired
     private LocationService locationService;
+    @GetMapping("/countries")
+    public ResponseEntity<List<String>> getCountries(
+            @RequestParam(required = false) String prefix) {
+        return ResponseEntity.ok(locationService.getCountries(prefix));
+    }
 
     @GetMapping("/states")
-    public ResponseEntity<List<String>> getStates(@RequestParam(required = false) String prefix) {
-        return ResponseEntity.ok(locationService.getStates(prefix));
+    public ResponseEntity<List<String>> getStates(
+            @RequestParam String country,
+            @RequestParam(required = false) String prefix) {
+        return ResponseEntity.ok(locationService.getStates(country, prefix));
     }
 
     @GetMapping("/cities")
     public ResponseEntity<List<String>> getCities(
+            @RequestParam String country,
             @RequestParam String state,
             @RequestParam(required = false) String prefix) {
-        return ResponseEntity.ok(locationService.getCities(state, prefix));
+        return ResponseEntity.ok(locationService.getCities(country, state, prefix));
     }
 
     @GetMapping("/zipcodes")
     public ResponseEntity<List<String>> getZipcodes(
+            @RequestParam String country,
             @RequestParam String state,
             @RequestParam String city,
             @RequestParam(required = false) String prefix) {
-        return ResponseEntity.ok(locationService.getZipcodes(state, city, prefix));
+        return ResponseEntity.ok(locationService.getZipcodes(country, state, city, prefix));
     }
 }
