@@ -1,6 +1,8 @@
 package com.example.PartTimer.controllers;
 
 import com.example.PartTimer.dto.AuthHeaderRequest;
+import com.example.PartTimer.dto.CheckUserRequest;
+import com.example.PartTimer.dto.CheckUserResponse;
 import com.example.PartTimer.dto.UserDTO;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
@@ -23,10 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -193,16 +192,49 @@ public class AuthController {
                     .body(Map.of("error", "Unauthorized access"));
         }
 
-        // Retrieve user details from authentication
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        Optional<User> thisuser = userService.findByEmail(userDetails.getUsername());
-        User currentuser = thisuser.get();
+        String username;
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        } else if (authentication.getPrincipal() instanceof String) {
+            username = (String) authentication.getPrincipal();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid authentication principal"));
+        }
+
+
+//        // Retrieve user details from authentication
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+//        Optional<User> thisuser = userService.findByEmail(userDetails.getUsername());
+//        User currentuser = thisuser.get();
 //        Map<String, Object> response = new HashMap<>();
+//
+//        System.out.println("user details: " + currentuser.getFullName() +" " + currentuser.getUserId());
+//
+//        // Prepare response
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("user_id", currentuser.getUserId());
+//        response.put("name", currentuser.getFullName());
+//        response.put("email", currentuser.getEmail());
+//        response.put("user_role", currentuser.getUserRole());
+//
+//        if (currentuser.getOrganization() != null) {
+//            Map<String, Object> orgDetails = new HashMap<>();
+//            orgDetails.put("id", currentuser.getOrganization().getId());
+//            orgDetails.put("name", currentuser.getOrganization().getName());
+//            response.put("organization", orgDetails);
+//        }
+//
+//        return ResponseEntity.ok(response);
+        Optional<User> thisuser = userService.findByEmail(username);
+        if (thisuser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found"));
+        }
 
-        System.out.println("user details: " + currentuser.getFullName() +" " + currentuser.getUserId());
-
-        // Prepare response
+        User currentuser = thisuser.get();
         Map<String, Object> response = new HashMap<>();
         response.put("user_id", currentuser.getUserId());
         response.put("name", currentuser.getFullName());
@@ -219,4 +251,43 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+//    @GetMapping("/oauth2/google")
+//    public ResponseEntity<String> oauth2Authorization() {
+//        return ResponseEntity.ok("OAuth2 authorization URL");
+//    }
+
+
+    @PostMapping("/check-user")
+    public ResponseEntity<CheckUserResponse> checkUser(@RequestBody CheckUserRequest request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+
+        if (userOptional.isEmpty()) {
+            // User does not exist
+            return ResponseEntity.ok(new CheckUserResponse(false, false, ""));
+        }
+        User user = userOptional.get();
+        // Check profile completeness
+        List<String> missingFields = new ArrayList<>();
+
+        if (user.getCountry() == null || user.getCountry().isEmpty()) {
+            missingFields.add("country");
+        }
+        if (user.getState() == null || user.getState().isEmpty()) {
+            missingFields.add("state");
+        }
+        if (user.getCity() == null || user.getCity().isEmpty()) {
+            missingFields.add("city");
+        }
+        if (user.getZipcode() == null || user.getZipcode().isEmpty()) {
+            missingFields.add("zipcode");
+        }
+        boolean isProfileComplete = missingFields.isEmpty();
+        String missingFieldsStr = String.join(", ", missingFields);
+
+        return ResponseEntity.ok(new CheckUserResponse(
+                true,
+                isProfileComplete,
+                missingFieldsStr
+        ));
+    }
 }
