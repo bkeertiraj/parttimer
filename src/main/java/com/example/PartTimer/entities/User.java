@@ -101,5 +101,23 @@ public class User { //renaming the class to User from Employee
     public boolean isCoOwner() {
         return UserRole.CO_OWNER.equals(this.userRole);
     }
+
+
+    @Column(name = "docs_verified", nullable = false)
+    private boolean docsVerified = false; // Default value is false
+
+    @Column(name = "type_of_verification_file")
+    private String typeOfVerificationFile;
+
+
+    @Column(name = "points", nullable = false)
+    private int points = 0; // Ensures there's always a default value.
+
+    @Column(name = "user_subscription", nullable = false)
+    private boolean userSubscription = false;
+
+    @Column(name = "seller_subscription", nullable = false)
+    private boolean sellerSubscription = false;
+
 }
 

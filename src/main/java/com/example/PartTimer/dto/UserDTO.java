@@ -19,4 +19,7 @@ public class UserDTO {
     private String state;
     private String city;
     private String zipcode;
+
+    private boolean docsVerified; // New field
+    private String typeOfVerificationFile; // New field
 }

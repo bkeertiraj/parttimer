@@ -65,6 +65,9 @@ public class AuthController {
         user.setCity(userDTO.getCity());
         user.setZipcode(userDTO.getZipcode());
 
+        user.setDocsVerified(userDTO.isDocsVerified());
+        user.setTypeOfVerificationFile(userDTO.getTypeOfVerificationFile());
+
         System.out.println("Received signup request at /register");
         System.out.println("User data: " + user);
         System.out.println("Received signup request for user: " + user.getEmail());
@@ -77,6 +80,8 @@ public class AuthController {
         System.out.println("User state: " + user.getState());
         System.out.println("User city: " + user.getState());
         System.out.println("User zipcode: " + user.getZipcode());
+        System.out.println("Is docs verified: " + user.isDocsVerified());
+        System.out.println("Type of verification file: " + user.getTypeOfVerificationFile());
 
         try {
             userService.signUp(user);
@@ -240,6 +245,9 @@ public class AuthController {
         response.put("name", currentuser.getFullName());
         response.put("email", currentuser.getEmail());
         response.put("user_role", currentuser.getUserRole());
+        response.put("points", currentuser.getPoints());
+        response.put("user subscription", currentuser.isUserSubscription());
+        response.put("seller subscription", currentuser.isSellerSubscription());
 
         if (currentuser.getOrganization() != null) {
             Map<String, Object> orgDetails = new HashMap<>();
