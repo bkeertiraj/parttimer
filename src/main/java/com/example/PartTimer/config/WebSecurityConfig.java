@@ -89,7 +89,8 @@ public class WebSecurityConfig {
                                         "/oauth2/authorize/google",
                                         "/oauth2/**",
                                         "/login/oauth2/**",
-                                        "/api/auth/**").permitAll()
+                                        "/api/auth/**",
+                                        "/stripe/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 )
