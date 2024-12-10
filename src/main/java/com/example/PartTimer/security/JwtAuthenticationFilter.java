@@ -111,6 +111,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
+            System.out.println("Request URI: " + request.getRequestURI());
+            System.out.println("Current Security Context: " + SecurityContextHolder.getContext().getAuthentication());
+
             filterChain.doFilter(request, response);
         } catch (JwtException e) {
             System.out.println("JWT token error: " + e.getMessage());

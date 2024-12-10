@@ -90,7 +90,7 @@ public class WebSecurityConfig {
                                         "/oauth2/**",
                                         "/login/oauth2/**",
                                         "/api/auth/**",
-                                        "/stripe/**").permitAll()
+                                        "/stripe/webhook").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -228,7 +228,8 @@ public class WebSecurityConfig {
                 "http://localhost:5173",
                 "https://accounts.google.com",
                 "http://localhost:8080",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "https://webhook.stripe.com"
         )); //
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
