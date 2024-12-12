@@ -11,4 +11,6 @@ import java.util.List;
 public interface LabourBookingRepository extends JpaRepository<LabourBooking, Long> {
 
     List<LabourBooking> findByUser(User user);
+
+    List<LabourBooking> findByUserEmail(String email);
 }

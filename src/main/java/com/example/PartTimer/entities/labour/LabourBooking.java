@@ -1,12 +1,15 @@
 package com.example.PartTimer.entities.labour;
 
 import com.example.PartTimer.entities.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Data
 public class LabourBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +25,7 @@ public class LabourBooking {
 
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<LabourAssignment> labourAssignments;
 
     private LocalDateTime createdAt;
