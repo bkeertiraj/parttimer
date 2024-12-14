@@ -1,10 +1,12 @@
 package com.example.PartTimer.entities.labour;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
+@Data
 public class Labour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

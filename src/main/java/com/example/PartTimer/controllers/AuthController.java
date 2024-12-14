@@ -5,7 +5,9 @@ import com.example.PartTimer.dto.CheckUserRequest;
 import com.example.PartTimer.dto.CheckUserResponse;
 import com.example.PartTimer.dto.UserDTO;
 import com.example.PartTimer.entities.User;
+import com.example.PartTimer.entities.labour.Labour;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.repositories.labour.LabourRepository;
 import com.example.PartTimer.services.CustomUserDetailsService;
 import com.example.PartTimer.services.JwtService;
 import com.example.PartTimer.services.UserService;
@@ -46,6 +48,9 @@ public class AuthController {
 
     @Autowired
     JwtService jwtService;
+
+    @Autowired
+    private LabourRepository labourRepository;
 
     // Sign-up endpoint
     @PostMapping("/register")
@@ -197,18 +202,28 @@ public class AuthController {
                     .body(Map.of("error", "Unauthorized access"));
         }
 
+//
+//        String username;
+//        if (authentication.getPrincipal() instanceof UserDetails) {
+//            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+//        } else if (authentication.getPrincipal() instanceof String) {
+//            username = (String) authentication.getPrincipal();
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(Map.of("error", "Invalid authentication principal"));
+//        }
 
-        String username;
+        String identifier; // email for User, phone number for Labour
         if (authentication.getPrincipal() instanceof UserDetails) {
-            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+            identifier = ((UserDetails) authentication.getPrincipal()).getUsername();
         } else if (authentication.getPrincipal() instanceof String) {
-            username = (String) authentication.getPrincipal();
+            identifier = (String) authentication.getPrincipal();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid authentication principal"));
         }
 
-
+//this section was already commented.
 //        // Retrieve user details from authentication
 //        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -233,69 +248,167 @@ public class AuthController {
 //        }
 //
 //        return ResponseEntity.ok(response);
-        Optional<User> thisuser = userService.findByEmail(username);
-        if (thisuser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "User not found"));
-        }
+// this section was already commented.
 
-        User currentuser = thisuser.get();
-        Map<String, Object> response = new HashMap<>();
-        response.put("user_id", currentuser.getUserId());
-        response.put("name", currentuser.getFullName());
-        response.put("email", currentuser.getEmail());
-        response.put("user_role", currentuser.getUserRole());
-        response.put("points", currentuser.getPoints());
-        response.put("user subscription", currentuser.isUserSubscription());
-        response.put("seller subscription", currentuser.isSellerSubscription());
+//        Optional<User> thisuser = userService.findByEmail(username);
+//        if (thisuser.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(Map.of("error", "User not found"));
+//        }
+//
+//        User currentuser = thisuser.get();
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("user_id", currentuser.getUserId());
+//        response.put("name", currentuser.getFullName());
+//        response.put("email", currentuser.getEmail());
+//        response.put("user_role", currentuser.getUserRole());
+//        response.put("points", currentuser.getPoints());
+//        response.put("user subscription", currentuser.isUserSubscription());
+//        response.put("seller subscription", currentuser.isSellerSubscription());
+//
+//        if (currentuser.getOrganization() != null) {
+//            Map<String, Object> orgDetails = new HashMap<>();
+//            orgDetails.put("id", currentuser.getOrganization().getId());
+//            orgDetails.put("name", currentuser.getOrganization().getName());
+//            response.put("organization", orgDetails);
+//        }
+//
+//        return ResponseEntity.ok(response);
 
-        if (currentuser.getOrganization() != null) {
+        // Try to fetch from User table
+        Optional<User> userOptional = userService.findByEmail(identifier);
+        if (userOptional.isPresent()) {
+            User currentUser = userOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("user_type", "USER");
+            response.put("user_id", currentUser.getUserId());
+            response.put("name", currentUser.getFullName());
+            response.put("email", currentUser.getEmail());
+            response.put("user_role", currentUser.getUserRole());
+            response.put("points", currentUser.getPoints());
+            response.put("user subscription", currentUser.isUserSubscription());
+            response.put("seller subscription", currentUser.isSellerSubscription());
+
+        if (currentUser.getOrganization() != null) {
             Map<String, Object> orgDetails = new HashMap<>();
-            orgDetails.put("id", currentuser.getOrganization().getId());
-            orgDetails.put("name", currentuser.getOrganization().getName());
+            orgDetails.put("id", currentUser.getOrganization().getId());
+            orgDetails.put("name", currentUser.getOrganization().getName());
             response.put("organization", orgDetails);
         }
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        }
+        // Try to fetch from Labour table
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(identifier);
+        if (labourOptional.isPresent()) {
+            Labour labour = labourOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("user_type", "LABOUR");
+            response.put("id", labour.getId());
+            response.put("name", labour.getFirstName() + " " + labour.getLastName());
+            response.put("phone", labour.getPhoneNumber());
+            response.put("average_rating", labour.getAverageRating());
+            // Add other relevant Labour details
+
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "User not found"));
     }
-
-//    @GetMapping("/oauth2/google")
-//    public ResponseEntity<String> oauth2Authorization() {
-//        return ResponseEntity.ok("OAuth2 authorization URL");
-//    }
-
 
     @PostMapping("/check-user")
     public ResponseEntity<CheckUserResponse> checkUser(@RequestBody CheckUserRequest request) {
+//        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+//
+//        if (userOptional.isEmpty()) {
+//            // User does not exist
+//            return ResponseEntity.ok(new CheckUserResponse(false, false, ""));
+//        }
+//        User user = userOptional.get();
+//        // Check profile completeness
+//        List<String> missingFields = new ArrayList<>();
+//
+//        if (user.getCountry() == null || user.getCountry().isEmpty()) {
+//            missingFields.add("country");
+//        }
+//        if (user.getState() == null || user.getState().isEmpty()) {
+//            missingFields.add("state");
+//        }
+//        if (user.getCity() == null || user.getCity().isEmpty()) {
+//            missingFields.add("city");
+//        }
+//        if (user.getZipcode() == null || user.getZipcode().isEmpty()) {
+//            missingFields.add("zipcode");
+//        }
+//        boolean isProfileComplete = missingFields.isEmpty();
+//        String missingFieldsStr = String.join(", ", missingFields);
+//
+//        return ResponseEntity.ok(new CheckUserResponse(
+//                true,
+//                isProfileComplete,
+//                missingFieldsStr
+//        ));
+
+        // First, check in User repository
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Check profile completeness for User
+            List<String> missingFields = new ArrayList<>();
 
-        if (userOptional.isEmpty()) {
-            // User does not exist
-            return ResponseEntity.ok(new CheckUserResponse(false, false, ""));
-        }
-        User user = userOptional.get();
-        // Check profile completeness
-        List<String> missingFields = new ArrayList<>();
+            if (user.getCountry() == null || user.getCountry().isEmpty()) {
+                missingFields.add("country");
+            }
+            if (user.getState() == null || user.getState().isEmpty()) {
+                missingFields.add("state");
+            }
+            if (user.getCity() == null || user.getCity().isEmpty()) {
+                missingFields.add("city");
+            }
+            if (user.getZipcode() == null || user.getZipcode().isEmpty()) {
+                missingFields.add("zipcode");
+            }
+            boolean isProfileComplete = missingFields.isEmpty();
+            String missingFieldsStr = String.join(", ", missingFields);
 
-        if (user.getCountry() == null || user.getCountry().isEmpty()) {
-            missingFields.add("country");
+            return ResponseEntity.ok(new CheckUserResponse(
+                    true,
+                    isProfileComplete,
+                    missingFieldsStr,
+                    "USER"  // Add user type
+            ));
         }
-        if (user.getState() == null || user.getState().isEmpty()) {
-            missingFields.add("state");
-        }
-        if (user.getCity() == null || user.getCity().isEmpty()) {
-            missingFields.add("city");
-        }
-        if (user.getZipcode() == null || user.getZipcode().isEmpty()) {
-            missingFields.add("zipcode");
-        }
-        boolean isProfileComplete = missingFields.isEmpty();
-        String missingFieldsStr = String.join(", ", missingFields);
 
+        // If not found in User, check in Labour repository
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(request.getEmail());
+        if (labourOptional.isPresent()) {
+            Labour labour = labourOptional.get();
+            // Check profile completeness for Labour
+            List<String> missingFields = new ArrayList<>();
+
+            if (labour.getServiceZipCodes() == null || labour.getServiceZipCodes().isEmpty()) {
+                missingFields.add("serviceZipCodes");
+            }
+            // Add more field checks as needed for Labour
+
+            boolean isProfileComplete = missingFields.isEmpty();
+            String missingFieldsStr = String.join(", ", missingFields);
+
+            return ResponseEntity.ok(new CheckUserResponse(
+                    true,
+                    isProfileComplete,
+                    missingFieldsStr,
+                    "LABOUR"  // Add user type
+            ));
+        }
+
+        // If user is not found in either repository
         return ResponseEntity.ok(new CheckUserResponse(
-                true,
-                isProfileComplete,
-                missingFieldsStr
+                false,
+                false,
+                "",
+                ""
         ));
     }
 }

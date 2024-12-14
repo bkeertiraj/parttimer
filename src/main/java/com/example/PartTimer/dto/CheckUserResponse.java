@@ -6,9 +6,17 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class CheckUserResponse {
     private boolean exists;
     private boolean isProfileComplete;
     private String missingFields;
+
+    private String userType;
+
+    public CheckUserResponse(boolean exists, boolean isProfileComplete, String missingFields, String userType) {
+        this.exists = exists;
+        this.isProfileComplete = isProfileComplete;
+        this.missingFields = missingFields;
+        this.userType = userType;
+    }
 }

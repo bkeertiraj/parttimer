@@ -2,7 +2,9 @@ package com.example.PartTimer.config;
 
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.repositories.labour.LabourRepository;
 import com.example.PartTimer.security.JwtAuthenticationFilter;
+import com.example.PartTimer.security.MultiUserAuthenticationProvider;
 import com.example.PartTimer.services.CustomUserDetailsService;
 import com.example.PartTimer.services.JwtService;
 import com.example.PartTimer.services.OAuth2UserService;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +32,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -57,16 +61,20 @@ public class WebSecurityConfig {
     private final OAuth2UserService oAuth2UserService;
     private final UserRepository userRepository;
 
+//    @Lazy
+    private final MultiUserAuthenticationProvider multiUserAuthenticationProvider;
+
     public WebSecurityConfig(JwtService jwtService,
                              UserDetailsService userDetailsService,
                              HandlerExceptionResolver handlerExceptionResolver,
-                             JwtAuthenticationFilter jwtFilter, UserRepository userRepository, OAuth2UserService oAuth2UserService, UserRepository userRepository1) {
+                             JwtAuthenticationFilter jwtFilter, UserRepository userRepository, OAuth2UserService oAuth2UserService, @Lazy MultiUserAuthenticationProvider multiUserAuthenticationProvider) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
-        this.userRepository = userRepository1;
+        this.userRepository = userRepository;
+        this.multiUserAuthenticationProvider = multiUserAuthenticationProvider;
     }
 
     @Bean
@@ -74,6 +82,7 @@ public class WebSecurityConfig {
         http
                 .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .authenticationProvider(multiUserAuthenticationProvider)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers(
@@ -258,6 +267,21 @@ public class WebSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
+
+    @Bean
+    @Lazy
+    public MultiUserAuthenticationProvider multiUserAuthenticationProvider(
+            UserRepository userRepository,
+            LabourRepository labourRepository,
+            PasswordEncoder passwordEncoder) {
+        return new MultiUserAuthenticationProvider(userRepository, labourRepository, passwordEncoder);
+    }
+
+//    @Bean
+//    public AuthenticationProvider multiUserAuthenticationProvider() {
+//        return new MultiUserAuthenticationProvider();
+//    }
+
 //
 //    @Bean
 //    public UserDetailsService userDetailsService() {
