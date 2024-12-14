@@ -10,6 +10,8 @@ import com.example.PartTimer.repositories.ServiceAssignmentRepository;
 import com.example.PartTimer.repositories.ServiceRepository;
 import com.example.PartTimer.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,12 +38,20 @@ public class BookingService {
     public Booking createBooking(BookingRequestDTO bookingRequest) {
 
         Long serviceId = bookingRequest.getServiceId();
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        System.out.println("User email derived in createBooking method: " + userEmail);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("Current logged-in user not found, coming from createBooking"));
+
         //Long userId = bookingRequest.getUserId();
         com.example.PartTimer.entities.Service service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new RuntimeException("Service Not Found Exception"));
 
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("User Not Found Exception"));
+//        User user = userRepository.findById(1L)
+//                .orElseThrow(() -> new RuntimeException("User Not Found Exception"));
 
         // Create a new booking and set the values from DTO
         Booking booking = new Booking();
