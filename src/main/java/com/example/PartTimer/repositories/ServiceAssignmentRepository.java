@@ -22,4 +22,8 @@ public interface ServiceAssignmentRepository extends JpaRepository<ServiceAssign
 
     // Add method to find the accepted/final assignment
     Optional<ServiceAssignment> findByBookingAndAgreedPriceGreaterThan(Booking booking, Double price);
+
+    // for user profile dashboard
+    Optional<ServiceAssignment> findTopByBookingOrderByIdAsc(Booking booking);
+
 }

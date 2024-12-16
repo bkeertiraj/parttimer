@@ -2,6 +2,7 @@ package com.example.PartTimer.services;
 
 import com.example.PartTimer.dto.BookingRequestDTO;
 import com.example.PartTimer.dto.ServiceRequestDTO;
+import com.example.PartTimer.dto.user_dashboard.UserBookingsDTO;
 import com.example.PartTimer.entities.Booking;
 import com.example.PartTimer.entities.ServiceAssignment;
 import com.example.PartTimer.entities.User;
@@ -14,8 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -99,5 +104,26 @@ public class BookingService {
         }
 
         return serviceRequestDTO;
+    }
+
+    public List<UserBookingsDTO> getUserBookings(User user) {
+        List<Booking> bookings = bookingRepository.findByUser(user);
+        return bookings.stream().map(booking -> {
+            UserBookingsDTO dto = new UserBookingsDTO();
+            dto.setBookingId(booking.getBookingId());
+            dto.setDate(LocalDate.parse(booking.getDate()));
+            dto.setTime(LocalTime.parse(booking.getTime()));
+            dto.setCity(booking.getLocation()); // assuming location contains city
+            dto.setZipcode(user.getZipcode());
+            dto.setDescription(booking.getDescription());
+            dto.setStatus(String.valueOf(booking.getStatus())); // assuming you have a status field in Booking
+            dto.setServiceName(booking.getService().getName()); // assuming Service has a name
+
+            // Handle service assignments
+            serviceAssignmentRepository.findTopByBookingOrderByIdAsc(booking)
+                    .ifPresent(assignment -> dto.setOfferedPrice(assignment.getOfferedPrice()));
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

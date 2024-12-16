@@ -3,6 +3,7 @@ package com.example.PartTimer.repositories;
 import com.example.PartTimer.entities.Booking;
 import com.example.PartTimer.entities.BookingStatus;
 import com.example.PartTimer.entities.Service;
+import com.example.PartTimer.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,4 +64,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 
     List<Booking> findByService(Service service);
+
+    //for user profile dashboard
+    @Query("SELECT DISTINCT b FROM Booking b WHERE b.user = :user")
+    List<Booking> findDistinctByUser(@Param("user") User user);
+
+    List<Booking> findByUser(User user);
 }

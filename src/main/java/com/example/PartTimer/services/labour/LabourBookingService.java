@@ -1,11 +1,13 @@
 package com.example.PartTimer.services.labour;
 
 import com.example.PartTimer.dto.labour.LabourBookingDTO;
+import com.example.PartTimer.dto.labour.LabourBookingsByUserDTO;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.labour.LabourAssignment;
 import com.example.PartTimer.entities.labour.LabourBooking;
 import com.example.PartTimer.entities.labour.LabourBookingStatus;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.repositories.labour.LabourAssignmentRepository;
 import com.example.PartTimer.repositories.labour.LabourBookingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class LabourBookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LabourAssignmentRepository labourAssignmentRepository;
 
     @Transactional
     public LabourBooking createLabourBooking(LabourBookingDTO labourBookingDTO) {
@@ -80,5 +85,60 @@ public class LabourBookingService {
         //save the booking
         return labourBookingRepository.save(booking);
 
+    }
+
+    public List<LabourBookingsByUserDTO> getLabourBookingsByUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        List<LabourBooking> bookings = labourBookingRepository.findByUserEmail(userEmail);
+        return bookings.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private LabourBookingsByUserDTO convertToDTO(LabourBooking booking) {
+        LabourBookingsByUserDTO dto = new LabourBookingsByUserDTO();
+        dto.setBookingId(booking.getId());
+//        dto.setAddress(booking.getAddress());
+//        dto.setPhoneNumber(booking.getPhoneNumber());
+//        dto.setEmail(booking.getEmail());
+//        dto.setCreatedAt(booking.getCreatedAt());
+//        dto.setUpdatedAt(booking.getUpdatedAt());
+
+        // Convert labour assignments
+//        dto.setLabourAssignments(
+//                booking.getLabourAssignments().stream().map(this::convertAssignmentToDTO)
+//                        .collect(Collectors.toList())
+//        );
+        dto.setLabourAssignments(
+                booking.getLabourAssignments().stream()
+                        .map(assignment -> {
+                            LabourBookingsByUserDTO.LabourAssignmentDTO assignmentDTO = convertAssignmentToDTO(assignment);
+
+                            // Count price offers for this specific labour assignment
+                            long priceOfferCount = labourAssignmentRepository.countPriceOffersForAssignment(assignment.getId());
+                            assignmentDTO.setNumberOfPriceOffers((int) priceOfferCount);
+
+                            return assignmentDTO;
+                        })
+                        .collect(Collectors.toList())
+        );
+
+        return dto;
+    }
+
+    private LabourBookingsByUserDTO.LabourAssignmentDTO convertAssignmentToDTO(LabourAssignment assignment) {
+        LabourBookingsByUserDTO.LabourAssignmentDTO dto = new LabourBookingsByUserDTO.LabourAssignmentDTO();
+        dto.setAssignmentId(assignment.getId());
+//        if (assignment.getLabour() != null) {
+//            dto.setLabourId(assignment.getLabour().getId());
+//        } else {
+//            dto.setLabourId(null); // Explicitly set to null
+//        }
+        dto.setBookingDate(assignment.getBookingDate());
+        dto.setTimeSlot(assignment.getTimeSlot());
+        dto.setBookingNote(assignment.getBookingNote());
+        dto.setBookingStatus(assignment.getBookingStatus().name());
+//        dto.setProposedPrice(assignment.getProposedPrice());
+        return dto;
     }
 }
