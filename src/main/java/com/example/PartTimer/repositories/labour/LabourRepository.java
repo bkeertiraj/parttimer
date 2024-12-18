@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface LabourRepository extends JpaRepository<Labour, Long> {
     Optional<Labour> findByPhoneNumber(String phoneNumber);
+
 }

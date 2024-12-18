@@ -1,14 +1,15 @@
 package com.example.PartTimer.services.labour;
 
+import com.example.PartTimer.dto.labour.LabourAssignmentDetailsDTO;
 import com.example.PartTimer.dto.labour.LabourBookingDTO;
 import com.example.PartTimer.dto.labour.LabourBookingsByUserDTO;
+import com.example.PartTimer.dto.labour.PriceOfferDetailsDTO;
 import com.example.PartTimer.entities.User;
-import com.example.PartTimer.entities.labour.LabourAssignment;
-import com.example.PartTimer.entities.labour.LabourBooking;
-import com.example.PartTimer.entities.labour.LabourBookingStatus;
+import com.example.PartTimer.entities.labour.*;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.repositories.labour.LabourAssignmentRepository;
 import com.example.PartTimer.repositories.labour.LabourBookingRepository;
+import com.example.PartTimer.repositories.labour.LabourPriceOfferRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,6 +32,9 @@ public class LabourBookingService {
 
     @Autowired
     private LabourAssignmentRepository labourAssignmentRepository;
+
+    @Autowired
+    private LabourPriceOfferRepository priceOfferRepository;
 
     @Transactional
     public LabourBooking createLabourBooking(LabourBookingDTO labourBookingDTO) {
@@ -139,6 +143,56 @@ public class LabourBookingService {
         dto.setBookingNote(assignment.getBookingNote());
         dto.setBookingStatus(assignment.getBookingStatus().name());
 //        dto.setProposedPrice(assignment.getProposedPrice());
+        return dto;
+    }
+
+    public List<PriceOfferDetailsDTO> getPriceOffersForAssignment(Long labourAssignmentId) {
+        LabourAssignment labourAssignment = labourAssignmentRepository.findById(labourAssignmentId)
+                .orElseThrow(() -> new RuntimeException("Labour Assignment not found"));
+
+        // Fetch all price offers for this assignment
+        List<LabourPriceOffer> priceOffers = priceOfferRepository.findByLabourAssignment(labourAssignment);
+
+        // Convert to DTOs
+        return priceOffers.stream()
+                .map(this::convertToPriceOfferDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PriceOfferDetailsDTO convertToPriceOfferDTO(LabourPriceOffer priceOffer) {
+        PriceOfferDetailsDTO dto = new PriceOfferDetailsDTO();
+
+        // Price offer details
+        dto.setPriceOfferId(priceOffer.getId());
+        dto.setProposedPrice(priceOffer.getOfferedPrice());
+
+        // Labour details
+        Labour labour = priceOffer.getLabour();
+        dto.setLabourFirstName(labour.getFirstName());
+        dto.setLabourMiddleName(labour.getMiddleName());
+        dto.setLabourLastName(labour.getLastName());
+
+        // Calculate and set labour rating
+        dto.setLabourRating(labour.getAverageRating());
+
+        return dto;
+    }
+
+    public LabourAssignmentDetailsDTO getLabourAssignmentDetails(Long labourAssignmentId) {
+        LabourAssignment labourAssignment = labourAssignmentRepository.findById(labourAssignmentId)
+                .orElseThrow(() -> new RuntimeException("Labour Assignment not found"));
+
+        LabourAssignmentDetailsDTO dto = new LabourAssignmentDetailsDTO();
+        dto.setDate(labourAssignment.getBookingDate());
+        dto.setTimeSlot(labourAssignment.getTimeSlot());
+        dto.setStatus(labourAssignment.getBookingStatus().name());
+        dto.setDescription(labourAssignment.getBookingNote());
+
+        LabourBooking booking = labourAssignment.getBooking();
+        dto.setLocation(booking.getAddress());
+        dto.setZipcode("761026");
+        dto.setCity("Podapadar");
+
         return dto;
     }
 }
