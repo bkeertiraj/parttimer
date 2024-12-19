@@ -38,10 +38,17 @@ public class LabourBookingController {
         return ResponseEntity.ok(priceeOffers);
     }
 
+    //not a part of flow
     @GetMapping("/assignment-details/{labourAssignmentId}")
     public ResponseEntity<LabourAssignmentDetailsDTO> getLabourAssignmentDetails(
             @PathVariable Long labourAssignmentId) {
         LabourAssignmentDetailsDTO details = labourBookingService.getLabourAssignmentDetails(labourAssignmentId);
         return ResponseEntity.ok(details);
+    }
+
+    @PostMapping("/accept-offer/{priceOfferId}")
+    public ResponseEntity<?> acceptPriceOffer(@PathVariable Long priceOfferId) {
+        labourBookingService.acceptPriceOffer(priceOfferId);
+        return ResponseEntity.ok().build();
     }
 }

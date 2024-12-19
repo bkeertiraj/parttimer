@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -151,7 +152,12 @@ public class LabourBookingService {
                 .orElseThrow(() -> new RuntimeException("Labour Assignment not found"));
 
         // Fetch all price offers for this assignment
-        List<LabourPriceOffer> priceOffers = priceOfferRepository.findByLabourAssignment(labourAssignment);
+//        List<LabourPriceOffer> priceOffers = priceOfferRepository.findByLabourAssignment(labourAssignment);
+
+        // Fetch only PENDING price offers for this assignment
+        List<LabourPriceOffer> priceOffers = priceOfferRepository
+                .findByLabourAssignmentAndStatus(labourAssignment, LabourPriceOfferStatus.PENDING);
+
 
         // Convert to DTOs
         return priceOffers.stream()
@@ -195,4 +201,69 @@ public class LabourBookingService {
 
         return dto;
     }
+
+    @Transactional
+    public void acceptPriceOffer(Long priceOfferId) {
+        LabourPriceOffer selectedPriceOffer = priceOfferRepository.findById(priceOfferId)
+                .orElseThrow(() -> new RuntimeException("Price Offer not found"));
+
+        LabourAssignment selectedAssignment = selectedPriceOffer.getLabourAssignment();
+        Labour selectedLabour = selectedPriceOffer.getLabour();
+        LocalDate bookingDate = selectedAssignment.getBookingDate();
+
+        // Find all PENDING price offers for this labour on the same date
+        List<LabourPriceOffer> labourPriceOffersOnDate = priceOfferRepository
+                .findByLabourAndLabourAssignmentBookingDateAndStatus(
+                        selectedLabour,
+                        bookingDate,
+                        LabourPriceOfferStatus.PENDING
+                );
+
+
+        // Withdraw conflicting price offers
+        labourPriceOffersOnDate.forEach(priceOffer -> {
+            if (!priceOffer.getId().equals(selectedPriceOffer.getId())) {
+
+                if (isTimeSlotConflicting(
+                        selectedAssignment.getTimeSlot(),
+                        priceOffer.getLabourAssignment().getTimeSlot()
+                )) {
+                    priceOffer.setStatus(LabourPriceOfferStatus.WITHDRAWN);
+                    priceOfferRepository.save(priceOffer);
+                }
+            }
+        });
+
+        // Set the selected price offer to ACCEPTED
+        selectedPriceOffer.setStatus(LabourPriceOfferStatus.ACCEPTED);
+        priceOfferRepository.save(selectedPriceOffer);
+
+        // Update the corresponding labour assignment status
+        selectedAssignment.setBookingStatus(LabourBookingStatus.ACCEPTED);
+        labourAssignmentRepository.save(selectedAssignment);
+    }
+
+    private boolean isTimeSlotConflicting(String selectedTimeSlot, String existingTimeSlot) {
+        // If "Full Day" is selected or exists, it conflicts with any other slot
+        if (selectedTimeSlot.equals("Full Day") || existingTimeSlot.equals("Full Day")) {
+            return true;
+        }
+
+        // "AM" slot conflicts only with "Full Day"
+        if (selectedTimeSlot.equals("8:30 AM - 11:30 AM") && existingTimeSlot.equals("Full Day")) {
+            return true;
+        }
+        if (selectedTimeSlot.equals("12:30 PM - 5:30 PM") && existingTimeSlot.equals("8:30 AM - 11:30 AM")) {
+            return false;
+        }
+
+        // "PM" slot conflicts only with "Full Day"
+        if (selectedTimeSlot.equals("12:30 PM - 5:30 PM")) {
+            return existingTimeSlot.equals("Full Day") ;
+        }
+
+        return false;
+
+    }
+
 }

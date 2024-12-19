@@ -88,6 +88,7 @@ public class LabourDashboardService {
         priceOffer.setLabour(currentLabour);
         priceOffer.setOfferedPrice(priceOfferDTO.getProposedPrice());
         priceOffer.setCreatedAt(LocalDateTime.now());
+        priceOffer.setStatus(LabourPriceOfferStatus.PENDING);
 
         return priceOfferRepository.save(priceOffer);
     }

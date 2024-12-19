@@ -17,6 +17,10 @@ public class LabourPriceOffer {
     @JoinColumn(name = "labour_assignment_id")
     private LabourAssignment labourAssignment;
 
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(255) CHECK (status IN ('PENDING', 'ACCEPTED', 'WITHDRAWN'))")
+    private LabourPriceOfferStatus status;
+
     @ManyToOne
     @JoinColumn(name = "labour_id")
     private Labour labour;

@@ -107,7 +107,15 @@ public class AuthController {
 
         if (userService.authenticate(email, password)) {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+
+            // Generate a new token regardless of previous token's status
             String token = jwtService.generateToken(userDetails);
+
+            System.out.println("New token generated for user: " + email);
+            System.out.println("Token: " + token);
+            System.out.println("Token Issued At: " + new Date());
+            System.out.println("Token Expiration: " + jwtService.extractExpiration(token));
+
 
             //create HTTP-only cookie
             Cookie jwtCookie = new Cookie("jwt", token);
@@ -122,6 +130,7 @@ public class AuthController {
 
             return ResponseEntity.ok(Map.of("token", token));
         } else {
+            System.out.println("Authentication failed for email: " + email);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
         }
     }

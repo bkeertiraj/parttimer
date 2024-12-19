@@ -52,7 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        System.out.println("Processing request to: " + request.getRequestURI());
+        final String requestURI = request.getRequestURI();
+        System.out.println("===== JWT Authentication Debug =====");
+        System.out.println("Request URI: " + requestURI);
         System.out.println("Authorization Header: " + authHeader);
 
         String jwt = null;
@@ -116,7 +118,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (JwtException e) {
+//            System.out.println("JWT token error: " + e.getMessage());
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Invalid token: " + e.getMessage());
             System.out.println("JWT token error: " + e.getMessage());
+
+            // If it's a login request and token is expired, allow it to proceed
+            if ("/api/auth/login".equals(request.getRequestURI())) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid token: " + e.getMessage());
         } catch (Exception e) {
