@@ -4,13 +4,16 @@ import com.example.PartTimer.dto.AuthHeaderRequest;
 import com.example.PartTimer.dto.CheckUserRequest;
 import com.example.PartTimer.dto.CheckUserResponse;
 import com.example.PartTimer.dto.UserDTO;
+import com.example.PartTimer.dto.labour.LabourSignUpRequestDTO;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.labour.Labour;
+import com.example.PartTimer.entities.labour.LabourSubscriptionStatus;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.repositories.labour.LabourRepository;
 import com.example.PartTimer.services.CustomUserDetailsService;
 import com.example.PartTimer.services.JwtService;
 import com.example.PartTimer.services.UserService;
+import com.example.PartTimer.services.labour.LabourService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -51,6 +54,10 @@ public class AuthController {
 
     @Autowired
     private LabourRepository labourRepository;
+
+    @Autowired
+    LabourService labourService;
+
 
     // Sign-up endpoint
     @PostMapping("/register")
@@ -419,5 +426,37 @@ public class AuthController {
                 "",
                 ""
         ));
+    }
+
+
+    @PostMapping("/labour/sign-up")
+    public ResponseEntity<String> labourSignUp(@RequestBody LabourSignUpRequestDTO signUpRequestDTO) {
+        if(labourRepository.findByPhoneNumber(signUpRequestDTO.getPhoneNumber()).isPresent()) {
+            return ResponseEntity.badRequest().body("Labour with this phone number already exists.");
+        }
+
+        //create a new Labour entity
+        Labour labour = new Labour();
+        labour.setPhoneNumber(signUpRequestDTO.getPhoneNumber());
+        labour.setTitle(signUpRequestDTO.getTitle());
+        labour.setFirstName(signUpRequestDTO.getFirstName());
+        labour.setMiddleName(signUpRequestDTO.getMiddleName());
+        labour.setLastName(signUpRequestDTO.getLastName());
+        labour.setPassword(signUpRequestDTO.getPassword());
+        labour.setServiceZipCodes(signUpRequestDTO.getServiceZipCodes());
+        labour.setIsRideNeeded(signUpRequestDTO.getIsRideNeeded());
+        labour.setSubscriptionStatus(
+                signUpRequestDTO.getSubscriptionStatus() != null ? signUpRequestDTO.getSubscriptionStatus() : LabourSubscriptionStatus.FREE
+        );
+
+        try {
+            labourService.signUp(labour);
+            System.out.println("User registered successfully: " + labour.getPhoneNumber());
+            return ResponseEntity.ok("User registered successfully");
+        } catch (Exception e) {
+            System.err.println("Error registering user: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error registering labour: " + e.getMessage());
+        }
     }
 }

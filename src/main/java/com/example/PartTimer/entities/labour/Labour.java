@@ -41,4 +41,6 @@ public class Labour {
                 .average()
                 .orElse(0.0);
     }
+
+    private Boolean isRideNeeded = false;
 }

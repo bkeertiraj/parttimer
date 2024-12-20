@@ -23,4 +23,6 @@ public interface LabourPriceOfferRepository extends JpaRepository<LabourPriceOff
             LocalDate bookingDate,
             LabourPriceOfferStatus status
     );
+
+    List<LabourPriceOffer> findByLabourIdOrderByCreatedAtDesc(Long labourId);
 }
