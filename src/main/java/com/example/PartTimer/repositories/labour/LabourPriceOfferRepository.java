@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LabourPriceOfferRepository extends JpaRepository<LabourPriceOffer, Long> {
@@ -25,4 +26,11 @@ public interface LabourPriceOfferRepository extends JpaRepository<LabourPriceOff
     );
 
     List<LabourPriceOffer> findByLabourIdOrderByCreatedAtDesc(Long labourId);
+
+    List<LabourPriceOffer> findByLabourAssignmentBookingAndStatus(
+            LabourBooking booking,
+            LabourPriceOfferStatus status
+    );
+
+    Optional<LabourPriceOffer> findFirstByLabourAssignmentAndStatus(LabourAssignment assignment, LabourPriceOfferStatus labourPriceOfferStatus);
 }

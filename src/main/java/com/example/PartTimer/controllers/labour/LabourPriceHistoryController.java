@@ -1,6 +1,7 @@
 package com.example.PartTimer.controllers.labour;
 
 import com.example.PartTimer.dto.labour.LabourPriceHistoryDTO;
+import com.example.PartTimer.dto.labour.LabourPriceOfferDetailsDTO;
 import com.example.PartTimer.services.labour.LabourDashboardService;
 import com.example.PartTimer.services.labour.LabourPriceHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,11 @@ public class LabourPriceHistoryController {
 
         List<LabourPriceHistoryDTO> priceHistory = labourPriceHistoryService.getLabourPriceHistory(labourDashboardService.getCurrentLabourId());
         return ResponseEntity.ok(priceHistory);
+    }
+
+    @GetMapping("/{offerId}/details")
+    public ResponseEntity<LabourPriceOfferDetailsDTO> getPriceOfferDetails(@PathVariable Long offerId) {
+        LabourPriceOfferDetailsDTO details = labourPriceHistoryService.getPriceOfferDetails(offerId);
+        return ResponseEntity.ok(details);
     }
 }

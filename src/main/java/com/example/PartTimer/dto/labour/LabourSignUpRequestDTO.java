@@ -13,7 +13,7 @@ public class LabourSignUpRequestDTO {
     private String middleName;
     private String lastName;
     private String password;
-    private List<String> serviceZipCodes;
+    private List<String> serviceCities;
     private Boolean isRideNeeded;
     private LabourSubscriptionStatus subscriptionStatus;
 }

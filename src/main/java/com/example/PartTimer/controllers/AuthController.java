@@ -239,58 +239,6 @@ public class AuthController {
                     .body(Map.of("error", "Invalid authentication principal"));
         }
 
-//this section was already commented.
-//        // Retrieve user details from authentication
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-//        Optional<User> thisuser = userService.findByEmail(userDetails.getUsername());
-//        User currentuser = thisuser.get();
-//        Map<String, Object> response = new HashMap<>();
-//
-//        System.out.println("user details: " + currentuser.getFullName() +" " + currentuser.getUserId());
-//
-//        // Prepare response
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("user_id", currentuser.getUserId());
-//        response.put("name", currentuser.getFullName());
-//        response.put("email", currentuser.getEmail());
-//        response.put("user_role", currentuser.getUserRole());
-//
-//        if (currentuser.getOrganization() != null) {
-//            Map<String, Object> orgDetails = new HashMap<>();
-//            orgDetails.put("id", currentuser.getOrganization().getId());
-//            orgDetails.put("name", currentuser.getOrganization().getName());
-//            response.put("organization", orgDetails);
-//        }
-//
-//        return ResponseEntity.ok(response);
-// this section was already commented.
-
-//        Optional<User> thisuser = userService.findByEmail(username);
-//        if (thisuser.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(Map.of("error", "User not found"));
-//        }
-//
-//        User currentuser = thisuser.get();
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("user_id", currentuser.getUserId());
-//        response.put("name", currentuser.getFullName());
-//        response.put("email", currentuser.getEmail());
-//        response.put("user_role", currentuser.getUserRole());
-//        response.put("points", currentuser.getPoints());
-//        response.put("user subscription", currentuser.isUserSubscription());
-//        response.put("seller subscription", currentuser.isSellerSubscription());
-//
-//        if (currentuser.getOrganization() != null) {
-//            Map<String, Object> orgDetails = new HashMap<>();
-//            orgDetails.put("id", currentuser.getOrganization().getId());
-//            orgDetails.put("name", currentuser.getOrganization().getName());
-//            response.put("organization", orgDetails);
-//        }
-//
-//        return ResponseEntity.ok(response);
-
         // Try to fetch from User table
         Optional<User> userOptional = userService.findByEmail(identifier);
         if (userOptional.isPresent()) {
@@ -304,6 +252,8 @@ public class AuthController {
             response.put("points", currentUser.getPoints());
             response.put("user subscription", currentUser.isUserSubscription());
             response.put("seller subscription", currentUser.isSellerSubscription());
+            response.put("city", currentUser.getCity());
+            response.put("zipcode", currentUser.getZipcode());
 
         if (currentUser.getOrganization() != null) {
             Map<String, Object> orgDetails = new HashMap<>();
@@ -402,10 +352,10 @@ public class AuthController {
             Labour labour = labourOptional.get();
             // Check profile completeness for Labour
             List<String> missingFields = new ArrayList<>();
-
-            if (labour.getServiceZipCodes() == null || labour.getServiceZipCodes().isEmpty()) {
-                missingFields.add("serviceZipCodes");
-            }
+//
+//            if (labour.getServiceZipCodes() == null || labour.getServiceZipCodes().isEmpty()) {
+//                missingFields.add("serviceZipCodes");
+//            }
             // Add more field checks as needed for Labour
 
             boolean isProfileComplete = missingFields.isEmpty();
@@ -443,7 +393,7 @@ public class AuthController {
         labour.setMiddleName(signUpRequestDTO.getMiddleName());
         labour.setLastName(signUpRequestDTO.getLastName());
         labour.setPassword(signUpRequestDTO.getPassword());
-        labour.setServiceZipCodes(signUpRequestDTO.getServiceZipCodes());
+        labour.setServiceCities(signUpRequestDTO.getServiceCities());
         labour.setIsRideNeeded(signUpRequestDTO.getIsRideNeeded());
         labour.setSubscriptionStatus(
                 signUpRequestDTO.getSubscriptionStatus() != null ? signUpRequestDTO.getSubscriptionStatus() : LabourSubscriptionStatus.FREE

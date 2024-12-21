@@ -12,7 +12,7 @@ public class LabourPriceHistoryDTO {
     private Long offerId;
     private Long assignmentId;
     private Long bookingId;
-    private String bookingAddress;
+//    private String bookingAddress;
     private String timeSlot;
     private BigDecimal offeredPrice;
     private LabourPriceOfferStatus status;

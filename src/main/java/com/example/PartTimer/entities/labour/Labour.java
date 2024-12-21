@@ -18,9 +18,12 @@ public class Labour {
     private String middleName;
     private String lastName;
     private String password;
+//
+//    @ElementCollection
+//    private List<String> serviceZipCodes; // Instead of zip1, zip2, zip3
 
     @ElementCollection
-    private List<String> serviceZipCodes; // Instead of zip1, zip2, zip3
+    private List<String> serviceCities;
 
     @Enumerated(EnumType.STRING)
     private LabourSubscriptionStatus subscriptionStatus;

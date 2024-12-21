@@ -234,6 +234,18 @@ public class LabourBookingService {
             }
         });
 
+        // Withdraw all pending price offers for the same booking
+        List<LabourPriceOffer> allPendingOffersForBooking = priceOfferRepository
+                .findByLabourAssignmentBookingAndStatus(
+                        selectedAssignment.getBooking(),
+                        LabourPriceOfferStatus.PENDING
+                );
+
+        allPendingOffersForBooking.forEach(offer -> {
+            offer.setStatus(LabourPriceOfferStatus.WITHDRAWN);
+            priceOfferRepository.save(offer);
+        });
+
         // Set the selected price offer to ACCEPTED
         selectedPriceOffer.setStatus(LabourPriceOfferStatus.ACCEPTED);
         priceOfferRepository.save(selectedPriceOffer);
