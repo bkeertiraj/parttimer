@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/labour-dashboard")
@@ -29,7 +30,11 @@ public class LabourDashboardController {
     @GetMapping("/open-bookings")
     public ResponseEntity<List<OpenBookingsForLabourDashboardDTO>> getOpenBookings() {
 
-        List<OpenBookingsForLabourDashboardDTO> openBookings = labourDashboardService.getOpenBookings();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phoneNumber = authentication.getName();
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(phoneNumber);
+        Labour labour = labourOptional.get();
+        List<OpenBookingsForLabourDashboardDTO> openBookings = labourDashboardService.getOpenBookings(labour.getId());
         return ResponseEntity.ok(openBookings);
     }
 

@@ -44,8 +44,8 @@ public class LabourDashboardService {
                 .orElseThrow(() -> new RuntimeException("Labour not found with phone number: " + phoneNumber));
     }
 
-    public List<OpenBookingsForLabourDashboardDTO> getOpenBookings() {
-        List<LabourAssignment> openAssignments = labourAssignmentRepository.findOpenBookings();
+    public List<OpenBookingsForLabourDashboardDTO> getOpenBookings(Long labourId) {
+        List<LabourAssignment> openAssignments = labourAssignmentRepository.findOpenBookingsForLabour(labourId);
 
         return openAssignments.stream()
                 .map(this::convertToDTO)

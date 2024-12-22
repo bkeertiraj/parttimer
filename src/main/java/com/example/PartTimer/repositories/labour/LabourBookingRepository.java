@@ -12,5 +12,5 @@ public interface LabourBookingRepository extends JpaRepository<LabourBooking, Lo
 
     List<LabourBooking> findByUser(User user);
 
-    List<LabourBooking> findByUserEmail(String email);
+    List<LabourBooking> findByUserEmailOrderByCreatedAtDesc(String email);
 }

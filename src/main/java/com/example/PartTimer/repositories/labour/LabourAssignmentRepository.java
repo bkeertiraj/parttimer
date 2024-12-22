@@ -22,7 +22,19 @@ public interface LabourAssignmentRepository extends JpaRepository<LabourAssignme
     @Query("SELECT COUNT(la) FROM LabourAssignment la WHERE la.id = :assignmentId AND la.proposedPrice IS NOT NULL")
     long countPriceOffersForAssignment(@Param("assignmentId") Long assignmentId);
 
-    //16-12-2024
-    @Query("SELECT la FROM LabourAssignment la JOIN FETCH la.booking b WHERE la.bookingStatus = 'OPEN'")
-    List<LabourAssignment> findOpenBookings();
+    //16-12-2024, and then updated at 21-12-2024
+    @Query("""
+    SELECT la 
+    FROM LabourAssignment la 
+    JOIN FETCH la.booking b 
+    WHERE la.bookingStatus = 'OPEN' 
+      AND NOT EXISTS (
+          SELECT lpo 
+          FROM LabourPriceOffer lpo 
+          WHERE lpo.labourAssignment = la 
+            AND lpo.labour.id = :labourId
+      )
+    ORDER BY la.booking.createdAt DESC
+""")
+    List<LabourAssignment> findOpenBookingsForLabour(@Param("labourId") Long labourId);
 }
