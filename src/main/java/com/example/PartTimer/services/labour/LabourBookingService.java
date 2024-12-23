@@ -64,6 +64,8 @@ public class LabourBookingService {
 
         LabourBooking booking = new LabourBooking();
         booking.setAddress(labourBookingDTO.getAddress());
+        booking.setCity(labourBookingDTO.getCity());
+        booking.setZipcode(labourBookingDTO.getZipcode());
         booking.setPhoneNumber(labourBookingDTO.getPhoneNumber());
         booking.setEmail(labourBookingDTO.getEmail());
         booking.setUser(currentUser);
@@ -196,8 +198,8 @@ public class LabourBookingService {
 
         LabourBooking booking = labourAssignment.getBooking();
         dto.setLocation(booking.getAddress());
-        dto.setZipcode("761026");
-        dto.setCity("Podapadar");
+        dto.setZipcode(booking.getZipcode());
+        dto.setCity(booking.getCity());
 
         return dto;
     }

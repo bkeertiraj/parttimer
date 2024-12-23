@@ -61,8 +61,9 @@ public class LabourDashboardService {
         dto.setBookingStatus(assignment.getBookingStatus());
         dto.setBookingId(assignment.getBooking().getId());
 
-        dto.setCity("Podapadar");
-        dto.setZipcode("761026");
+        LabourBooking booking = assignment.getBooking();
+        dto.setCity(booking.getCity()); //Podapadar
+        dto.setZipcode(booking.getZipcode());
         return dto;
     }
 

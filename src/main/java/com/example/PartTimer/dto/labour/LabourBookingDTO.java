@@ -21,6 +21,9 @@ public class LabourBookingDTO {
     private String sharedNote;
     private List<LaborDetailDTO> laborDetails;
 
+    private String city;
+    private String zipcode;
+
     // Nested DTO for labor details
     public static class LaborDetailDTO {
         private Date date;

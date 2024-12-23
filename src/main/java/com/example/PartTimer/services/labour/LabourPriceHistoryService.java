@@ -37,8 +37,9 @@ public class LabourPriceHistoryService {
         dto.setOfferedPrice(offer.getOfferedPrice());
         dto.setStatus(offer.getStatus());
         dto.setBookingDate(offer.getLabourAssignment().getBookingDate());
-        dto.setCity("Podapadar");
-        dto.setZipCode("761026");
+        LabourBooking booking = offer.getLabourAssignment().getBooking();
+        dto.setCity(booking.getCity());
+        dto.setZipCode(booking.getZipcode());
         return dto;
     }
 

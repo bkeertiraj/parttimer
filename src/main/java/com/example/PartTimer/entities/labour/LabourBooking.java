@@ -18,6 +18,8 @@ public class LabourBooking {
     private String address;
     private String phoneNumber;
     private String email;
+    private String zipcode;
+    private String city;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
