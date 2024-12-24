@@ -4,4 +4,5 @@ public enum LabourPriceOfferStatus {
     PENDING,
     ACCEPTED, //SELECTED
     WITHDRAWN,
+    EXPIRED
 }

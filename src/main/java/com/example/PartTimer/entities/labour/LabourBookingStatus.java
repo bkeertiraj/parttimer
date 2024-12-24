@@ -4,5 +4,6 @@ public enum LabourBookingStatus {
     OPEN,
     PRICE_OFFERED,
     ACCEPTED,
-    COMPLETED
+    COMPLETED,
+    EXPIRED
 }

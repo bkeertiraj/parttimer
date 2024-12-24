@@ -4,10 +4,8 @@ import com.example.PartTimer.dto.labour.LabourBookingsByUserDTO;
 import com.example.PartTimer.dto.labour.LabourPriceOfferDTO;
 import com.example.PartTimer.dto.labour.OpenBookingsForLabourDashboardDTO;
 import com.example.PartTimer.entities.labour.*;
-import com.example.PartTimer.repositories.labour.LabourAssignmentRepository;
-import com.example.PartTimer.repositories.labour.LabourBookingRepository;
-import com.example.PartTimer.repositories.labour.LabourPriceOfferRepository;
-import com.example.PartTimer.repositories.labour.LabourRepository;
+import com.example.PartTimer.repositories.labour.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +29,9 @@ public class LabourDashboardService {
 
     @Autowired
     private LabourPriceOfferRepository priceOfferRepository;
+
+    @Autowired
+    private LabourPriceOfferCountRepository labourPriceOfferCountRepository;
 
     // Method to get current labour's ID by phone number from authentication
     public Long getCurrentLabourId() {
@@ -67,6 +68,7 @@ public class LabourDashboardService {
         return dto;
     }
 
+    @Transactional
     public LabourPriceOffer offerPriceForBooking(LabourPriceOfferDTO priceOfferDTO) {
         // Fetch the specific labour assignment
         LabourAssignment labourAssignment = labourAssignmentRepository.findById(priceOfferDTO.getLabourAssignmentId())
@@ -91,6 +93,25 @@ public class LabourDashboardService {
         priceOffer.setCreatedAt(LocalDateTime.now());
         priceOffer.setStatus(LabourPriceOfferStatus.PENDING);
 
-        return priceOfferRepository.save(priceOffer);
+        LabourPriceOffer savedOffer = priceOfferRepository.save(priceOffer);
+
+        System.out.println("new price offer saved");
+
+        // update the offer count
+        LabourBooking labourBooking = labourAssignment.getBooking();
+        LabourPriceOfferCount offerCount = labourPriceOfferCountRepository
+                .findByLabourBooking(labourBooking)
+                .orElseGet(() -> {
+                    // Create a new record if not exists
+                    LabourPriceOfferCount newOfferCount = new LabourPriceOfferCount();
+                    newOfferCount.setLabourBooking(labourBooking);
+                    newOfferCount.setOfferCount(0);
+                    return newOfferCount;
+                });
+        offerCount.setOfferCount(offerCount.getOfferCount() + 1);
+        labourPriceOfferCountRepository.save(offerCount);
+
+        System.out.println("after the offerCount block");
+        return priceOfferRepository.save(savedOffer);
     }
 }
