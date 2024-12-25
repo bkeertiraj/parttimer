@@ -29,8 +29,10 @@ public interface LabourAssignmentRepository extends JpaRepository<LabourAssignme
     FROM LabourAssignment la 
     JOIN FETCH la.booking b 
     LEFT JOIN LabourPriceOfferCount lpc ON lpc.labourBooking = b 
+    JOIN Labour l ON l.id = :labourId
     WHERE la.bookingStatus = 'OPEN' 
       AND (lpc.offerCount IS NULL OR lpc.offerCount < 10)
+      AND b.city IN (SELECT city FROM Labour l JOIN l.serviceCities city WHERE l.id = :labourId)
       AND NOT EXISTS (
           SELECT lpo 
           FROM LabourPriceOffer lpo 

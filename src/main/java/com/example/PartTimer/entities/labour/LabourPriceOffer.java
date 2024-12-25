@@ -18,7 +18,7 @@ public class LabourPriceOffer {
     private LabourAssignment labourAssignment;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(255) CHECK (status IN ('PENDING', 'ACCEPTED', 'WITHDRAWN'))")
+    @Column(columnDefinition = "VARCHAR(255) CHECK (status IN ('PENDING', 'ACCEPTED', 'WITHDRAWN', 'EXPIRED'))")
     private LabourPriceOfferStatus status;
 
     @ManyToOne

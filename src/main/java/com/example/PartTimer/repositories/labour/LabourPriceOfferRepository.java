@@ -33,4 +33,6 @@ public interface LabourPriceOfferRepository extends JpaRepository<LabourPriceOff
     );
 
     Optional<LabourPriceOffer> findFirstByLabourAssignmentAndStatus(LabourAssignment assignment, LabourPriceOfferStatus labourPriceOfferStatus);
+
+    int countByLabourAssignment_BookingId(Long bookingId);
 }

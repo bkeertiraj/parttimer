@@ -9,6 +9,7 @@ import com.example.PartTimer.entities.labour.*;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.repositories.labour.LabourAssignmentRepository;
 import com.example.PartTimer.repositories.labour.LabourBookingRepository;
+import com.example.PartTimer.repositories.labour.LabourPriceOfferCountRepository;
 import com.example.PartTimer.repositories.labour.LabourPriceOfferRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class LabourBookingService {
 
     @Autowired
     private LabourPriceOfferRepository priceOfferRepository;
+
+    @Autowired
+    private LabourPriceOfferCountRepository labourPriceOfferCountRepository;
 
     @Transactional
     public LabourBooking createLabourBooking(LabourBookingDTO labourBookingDTO) {
@@ -122,8 +126,13 @@ public class LabourBookingService {
                             LabourBookingsByUserDTO.LabourAssignmentDTO assignmentDTO = convertAssignmentToDTO(assignment);
 
                             // Count price offers for this specific labour assignment
-                            long priceOfferCount = labourAssignmentRepository.countPriceOffersForAssignment(assignment.getId());
-                            assignmentDTO.setNumberOfPriceOffers((int) priceOfferCount);
+//                            long priceOfferCount = labourAssignmentRepository.countPriceOffersForAssignment(assignment.getId());
+//                            assignmentDTO.setNumberOfPriceOffers((int) priceOfferCount);
+                            int priceOfferCount = labourPriceOfferCountRepository.findByLabourBookingId(booking.getId())
+                                    .map(LabourPriceOfferCount::getOfferCount)
+                                    .orElseGet(() -> calculateAndSaveOfferCount(booking)); // Fallback for old data
+
+                            assignmentDTO.setNumberOfPriceOffers(priceOfferCount);
 
                             return assignmentDTO;
                         })
@@ -132,6 +141,20 @@ public class LabourBookingService {
 
         return dto;
     }
+
+    private int calculateAndSaveOfferCount(LabourBooking booking) {
+        // Dynamically calculate the count of price offers for the booking
+        int count = priceOfferRepository.countByLabourAssignment_BookingId(booking.getId());
+
+        // Save the calculated count into LabourPriceOfferCount for future use
+        LabourPriceOfferCount offerCount = new LabourPriceOfferCount();
+        offerCount.setLabourBooking(booking);
+        offerCount.setOfferCount(count);
+        labourPriceOfferCountRepository.save(offerCount);
+
+        return count;
+    }
+
 
     private LabourBookingsByUserDTO.LabourAssignmentDTO convertAssignmentToDTO(LabourAssignment assignment) {
         LabourBookingsByUserDTO.LabourAssignmentDTO dto = new LabourBookingsByUserDTO.LabourAssignmentDTO();

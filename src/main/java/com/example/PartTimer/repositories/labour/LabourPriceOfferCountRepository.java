@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface LabourPriceOfferCountRepository extends JpaRepository<LabourPriceOfferCount, Long> {
 
     Optional<LabourPriceOfferCount> findByLabourBooking(LabourBooking labourBooking);
+
+    Optional<LabourPriceOfferCount> findByLabourBookingId(Long labourBookingId);
 }
