@@ -85,6 +85,18 @@ public class LabourDashboardService {
             throw new IllegalStateException("You have already made an offer for this assignment");
         }
 
+        // Get the LabourBooking associated with the assignment
+        LabourBooking labourBooking = labourAssignment.getBooking();
+
+        // Check the offer count for the LabourBooking
+        int currentOfferCount = labourPriceOfferCountRepository.findByLabourBooking(labourBooking)
+                .map(LabourPriceOfferCount::getOfferCount)
+                .orElse(0); // Default to 0 if no count record exists
+
+        if (currentOfferCount >= 10) {
+            throw new IllegalStateException("Maximum limit of 10 offers reached for this booking");
+        }
+
         // Create a new PriceOffer
         LabourPriceOffer priceOffer = new LabourPriceOffer();
         priceOffer.setLabourAssignment(labourAssignment);
@@ -98,9 +110,7 @@ public class LabourDashboardService {
         System.out.println("new price offer saved");
 
         // update the offer count
-        LabourBooking labourBooking = labourAssignment.getBooking();
-        LabourPriceOfferCount offerCount = labourPriceOfferCountRepository
-                .findByLabourBooking(labourBooking)
+        LabourPriceOfferCount offerCount = labourPriceOfferCountRepository.findByLabourBooking(labourBooking)
                 .orElseGet(() -> {
                     // Create a new record if not exists
                     LabourPriceOfferCount newOfferCount = new LabourPriceOfferCount();
