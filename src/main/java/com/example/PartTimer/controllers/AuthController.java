@@ -126,8 +126,8 @@ public class AuthController {
 
             //create HTTP-only cookie
             Cookie jwtCookie = new Cookie("jwt", token);
-            jwtCookie.setHttpOnly(true); // prevents JavaScript access
-            jwtCookie.setSecure(true); //send only over HTTPS
+            jwtCookie.setHttpOnly(false); // prevents JavaScript access
+            jwtCookie.setSecure(false); //send only over HTTPS
             jwtCookie.setPath("/"); //available across the entire application
             jwtCookie.setMaxAge(2 * 24 * 60 * 60); //2 days in seconds
 
