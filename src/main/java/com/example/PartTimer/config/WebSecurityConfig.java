@@ -85,23 +85,24 @@ public class WebSecurityConfig {
                 .authenticationProvider(multiUserAuthenticationProvider)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(
-                                        "/api/auth/**",
-                                        "/api/auth/register",
-                                        "/api/auth/login",
-                                        "/api/services",
-                                        "/api/locations/**",
-                                        "/api/auth/current-user",
-                                        "/api/email/**",
-                                        "/oauth2/authorize/**",
-                                        "/login/oauth2/code/**",
-                                        "/oauth2/authorize/google",
-                                        "/oauth2/**",
-                                        "/login/oauth2/**",
-                                        "/api/auth/**",
-                                        "/stripe/webhook").permitAll()
-                                .requestMatchers("/error").permitAll()
-                                .anyRequest().authenticated()
+//                                .requestMatchers(
+//                                        "/api/auth/**",
+//                                        "/api/auth/register",
+//                                        "/api/auth/login",
+//                                        "/api/services",
+//                                        "/api/locations/**",
+//                                        "/api/auth/current-user",
+//                                        "/api/email/**",
+//                                        "/oauth2/authorize/**",
+//                                        "/login/oauth2/code/**",
+//                                        "/oauth2/authorize/google",
+//                                        "/oauth2/**",
+//                                        "/login/oauth2/**",
+//                                        "/api/auth/**",
+//                                        "/stripe/webhook").permitAll()
+//                                .requestMatchers("/error").permitAll()
+//                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorizationEndpoint ->
