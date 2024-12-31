@@ -239,7 +239,8 @@ public class WebSecurityConfig {
                 "https://accounts.google.com",
                 "http://localhost:8080",
                 "http://localhost:3000",
-                "https://webhook.stripe.com"
+                "https://webhook.stripe.com",
+                "https://parttimer.vercel.app/"
         )); //
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
