@@ -126,14 +126,16 @@ public class AuthController {
 
             //create HTTP-only cookie
             Cookie jwtCookie = new Cookie("jwt", token);
-            jwtCookie.setHttpOnly(false); // prevents JavaScript access
-            jwtCookie.setSecure(false); //send only over HTTPS
+            jwtCookie.setHttpOnly(true); // prevents JavaScript access
+            jwtCookie.setSecure(true); //send only over HTTPS
             jwtCookie.setPath("/"); //available across the entire application
             jwtCookie.setMaxAge(2 * 24 * 60 * 60); //2 days in seconds
 
             // Add cookie to response
             System.out.println("cookie issued: " + jwtCookie.getName());
             response.addCookie(jwtCookie);
+            response.setHeader("Set-Cookie",
+                    String.format("%s; SameSite=None", response.getHeader("Set-Cookie")));
 
             return ResponseEntity.ok(Map.of("token", token));
         } else {
