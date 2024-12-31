@@ -193,7 +193,7 @@ public class AuthController {
         // Create a cookie with 0 max age to delete it
         Cookie jwtCookie = new Cookie("jwt", null);
         jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
+        jwtCookie.setSecure(false); //true
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0); // Expire immediately
 
