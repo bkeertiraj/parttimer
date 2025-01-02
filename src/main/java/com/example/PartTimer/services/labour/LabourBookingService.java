@@ -287,15 +287,15 @@ public class LabourBookingService {
         }
 
         // "AM" slot conflicts only with "Full Day"
-        if (selectedTimeSlot.equals("8:30 AM - 11:30 AM") && existingTimeSlot.equals("Full Day")) {
+        if (selectedTimeSlot.equals("7:30 AM - 11:30 AM") && existingTimeSlot.equals("Full Day")) {
             return true;
         }
-        if (selectedTimeSlot.equals("12:30 PM - 5:30 PM") && existingTimeSlot.equals("8:30 AM - 11:30 AM")) {
+        if (selectedTimeSlot.equals("12:30 PM - 4:30 PM") && existingTimeSlot.equals("7:30 AM - 11:30 AM")) {
             return false;
         }
 
         // "PM" slot conflicts only with "Full Day"
-        if (selectedTimeSlot.equals("12:30 PM - 5:30 PM")) {
+        if (selectedTimeSlot.equals("12:30 PM - 4:30 PM")) {
             return existingTimeSlot.equals("Full Day") ;
         }
 
