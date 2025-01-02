@@ -26,4 +26,6 @@ public interface UsCityRepository extends JpaRepository<UsCity, Integer> {
             @Param("state") String state,
             @Param("city") String city,
             @Param("prefix") String prefix);
+
+    List<UsCity> findByCityIgnoreCase(String city);
 }

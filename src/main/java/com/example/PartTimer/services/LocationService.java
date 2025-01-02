@@ -1,10 +1,12 @@
 package com.example.PartTimer.services;
 
+import com.example.PartTimer.entities.country.UsCity;
 import com.example.PartTimer.repositories.UsCityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LocationService {
@@ -27,5 +29,12 @@ public class LocationService {
     public List<String> getZipcodes(String country, String state, String city, String prefix) {
         return usCityRepository.findDistinctZipcodesByCountryStateAndCityAndPrefix(
                 country, state, city, prefix != null ? prefix : "");
+    }
+
+    public List<String> getZipcodesByCity(String city) {
+        return usCityRepository.findByCityIgnoreCase(city)
+                .stream()
+                .map(UsCity::getZipcode)
+                .collect(Collectors.toList());
     }
 }

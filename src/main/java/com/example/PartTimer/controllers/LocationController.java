@@ -3,10 +3,7 @@ package com.example.PartTimer.controllers;
 import com.example.PartTimer.services.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,5 +41,13 @@ public class LocationController {
             @RequestParam String city,
             @RequestParam(required = false) String prefix) {
         return ResponseEntity.ok(locationService.getZipcodes(country, state, city, prefix));
+    }
+
+    @GetMapping("/{city}/zipcodes")
+    public ResponseEntity<List<String>> getCityZipcodes(@PathVariable String city) {
+        List<String> zipcodes = locationService.getZipcodesByCity(city);
+        return zipcodes.isEmpty()
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(zipcodes);
     }
 }
