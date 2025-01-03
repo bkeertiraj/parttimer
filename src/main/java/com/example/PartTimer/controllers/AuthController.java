@@ -256,6 +256,7 @@ public class AuthController {
             response.put("seller subscription", currentUser.isSellerSubscription());
             response.put("city", currentUser.getCity());
             response.put("zipcode", currentUser.getZipcode());
+            response.put("state", currentUser.getState());
 
         if (currentUser.getOrganization() != null) {
             Map<String, Object> orgDetails = new HashMap<>();

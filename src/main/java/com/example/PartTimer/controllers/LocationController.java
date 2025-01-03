@@ -1,11 +1,14 @@
 package com.example.PartTimer.controllers;
 
+import com.example.PartTimer.entities.country.UsCity;
+import com.example.PartTimer.repositories.UsCityRepository;
 import com.example.PartTimer.services.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/locations")
@@ -13,6 +16,10 @@ public class LocationController {
 
     @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private UsCityRepository usCityRepository;
+
     @GetMapping("/countries")
     public ResponseEntity<List<String>> getCountries(
             @RequestParam(required = false) String prefix) {
@@ -43,11 +50,20 @@ public class LocationController {
         return ResponseEntity.ok(locationService.getZipcodes(country, state, city, prefix));
     }
 
-    @GetMapping("/{city}/zipcodes")
-    public ResponseEntity<List<String>> getCityZipcodes(@PathVariable String city) {
-        List<String> zipcodes = locationService.getZipcodesByCity(city);
-        return zipcodes.isEmpty()
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(zipcodes);
+    @GetMapping("/city-zipcode")
+    public ResponseEntity<?> getCityZipcodes(
+            @RequestParam String city,
+            @RequestParam String state) {
+
+        List<String> zipcodes = usCityRepository.findByCityAndStateIgnoreCase(city, state)
+                .stream()
+                .map(UsCity::getZipcode)
+                .collect(Collectors.toList());
+
+        if (zipcodes.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(zipcodes);
     }
 }
