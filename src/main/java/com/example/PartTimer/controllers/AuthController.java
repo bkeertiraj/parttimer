@@ -190,25 +190,25 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletResponse response) {
-        // Create a cookie with 0 max age to delete it
-        Cookie jwtCookie = new Cookie("jwt", null);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(false); //true
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(0); // Expire immediately
-        jwtCookie.setAttribute("SameSite", "none");
-
-        // Add SameSite=None manually to ensure proper deletion
-        response.addCookie(jwtCookie);
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", 0);
-
-
-        return ResponseEntity.ok("Logged out successfully");
-    }
+//    @PostMapping("/logout")
+//    public ResponseEntity<String> logout(HttpServletResponse response) {
+//        // Create a cookie with 0 max age to delete it
+//        Cookie jwtCookie = new Cookie("jwt", null);
+//        jwtCookie.setHttpOnly(true);
+//        jwtCookie.setSecure(false); //true
+//        jwtCookie.setPath("/");
+//        jwtCookie.setMaxAge(0); // Expire immediately
+//        jwtCookie.setAttribute("SameSite", "none");
+//
+//        // Add SameSite=None manually to ensure proper deletion
+//        response.addCookie(jwtCookie);
+//        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+//        response.setHeader("Pragma", "no-cache");
+//        response.setDateHeader("Expires", 0);
+//
+//
+//        return ResponseEntity.ok("Logged out successfully");
+//    }
 
     @Autowired
     UserRepository userRepository;

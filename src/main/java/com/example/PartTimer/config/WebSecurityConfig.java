@@ -37,6 +37,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -137,7 +139,7 @@ public class WebSecurityConfig {
                             jwtCookie.setMaxAge(2 * 24 * 60 * 60);
 
                             response.addCookie(jwtCookie);
-                            response.sendRedirect("http://localhost:5173"); //"http://localhost:5173/oauth2/success?token="
+                            response.sendRedirect("https://parttimer.vercel.app/"); //"http://localhost:5173/oauth2/success?token="
 
                             response.setContentType("application/json");
                             response.setCharacterEncoding("UTF-8");
@@ -160,7 +162,7 @@ public class WebSecurityConfig {
                             response.getWriter().write(jsonResponse);
                         })
                         .failureHandler((request, response, exception) -> {
-                            response.sendRedirect("http://localhost:5173/oauth2/error");
+                            response.sendRedirect("https://parttimer.vercel.app/oauth2/error");
 
                             response.setContentType("application/json");
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -173,6 +175,16 @@ public class WebSecurityConfig {
                             String jsonResponse = new ObjectMapper().writeValueAsString(errorData);
                             response.getWriter().write(jsonResponse);
                         })
+                )
+                .logout(
+                        logout -> logout
+                                .logoutUrl("/logout")
+                                .addLogoutHandler(clearSiteData)
+                                .deleteCookies("jwt")
+                                .logoutSuccessHandler(((request, response, authentication) -> {
+                                    response.setStatus(HttpServletResponse.SC_OK);
+                                    response.getWriter().write("{\"message\": \"Logged out successfully\"}");
+                                }))
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -193,6 +205,13 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(
+            new ClearSiteDataHeaderWriter(
+                    ClearSiteDataHeaderWriter.Directive.COOKIES,
+                    ClearSiteDataHeaderWriter.Directive.STORAGE,
+                    ClearSiteDataHeaderWriter.Directive.CACHE
+            )
+    );
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
