@@ -199,8 +199,10 @@ public class AuthController {
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0); // Expire immediately
 
-        // Add cookie to response
+        // Add SameSite=None manually to ensure proper deletion
         response.addCookie(jwtCookie);
+        response.setHeader("Set-Cookie",
+                String.format("%s; SameSite=None", response.getHeader("Set-Cookie")));
 
         return ResponseEntity.ok("Logged out successfully");
     }
