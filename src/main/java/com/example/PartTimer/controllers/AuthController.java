@@ -198,11 +198,14 @@ public class AuthController {
         jwtCookie.setSecure(false); //true
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0); // Expire immediately
+        jwtCookie.setAttribute("SameSite", "none");
 
         // Add SameSite=None manually to ensure proper deletion
         response.addCookie(jwtCookie);
-        response.setHeader("Set-Cookie",
-                String.format("%s; SameSite=None", response.getHeader("Set-Cookie")));
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
 
         return ResponseEntity.ok("Logged out successfully");
     }
