@@ -14,6 +14,7 @@ import com.example.PartTimer.services.CustomUserDetailsService;
 import com.example.PartTimer.services.JwtService;
 import com.example.PartTimer.services.UserService;
 import com.example.PartTimer.services.labour.LabourService;
+import com.example.PartTimer.utils.EncryptionUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -58,6 +59,7 @@ public class AuthController {
     @Autowired
     LabourService labourService;
 
+    EncryptionUtil encryptionUtil;
 
     // Sign-up endpoint
     @PostMapping("/register")
@@ -247,7 +249,8 @@ public class AuthController {
         }
 
         // Try to fetch from User table
-        Optional<User> userOptional = userService.findByEmail(identifier);
+        String encryptedEmail = encryptionUtil.encrypt(identifier);
+        Optional<User> userOptional = userService.findByEmail(encryptedEmail);
         if (userOptional.isPresent()) {
             User currentUser = userOptional.get();
             Map<String, Object> response = new HashMap<>();
@@ -325,7 +328,8 @@ public class AuthController {
 //        ));
 
         // First, check in User repository
-        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        String encryptedEmail = encryptionUtil.encrypt(request.getEmail());
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             // Check profile completeness for User
