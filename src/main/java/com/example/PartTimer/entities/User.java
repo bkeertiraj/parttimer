@@ -1,5 +1,6 @@
 package com.example.PartTimer.entities;
 
+import com.example.PartTimer.converter.EncryptedStringConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,7 @@ public class User { //renaming the class to User from Employee
     @Column(nullable = false)
     private String lastName;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -46,9 +48,11 @@ public class User { //renaming the class to User from Employee
     @Column(nullable = false)
     private String password; //new password field
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column(name = "address")
     private String address;  // new address field
 
