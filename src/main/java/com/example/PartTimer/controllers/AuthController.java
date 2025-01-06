@@ -59,6 +59,7 @@ public class AuthController {
     @Autowired
     LabourService labourService;
 
+    @Autowired
     EncryptionUtil encryptionUtil;
 
     // Sign-up endpoint
