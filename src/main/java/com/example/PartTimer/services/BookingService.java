@@ -10,6 +10,7 @@ import com.example.PartTimer.repositories.BookingRepository;
 import com.example.PartTimer.repositories.ServiceAssignmentRepository;
 import com.example.PartTimer.repositories.ServiceRepository;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +35,9 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    EncryptionUtil encryptionUtil;
+
     private final ServiceAssignmentRepository serviceAssignmentRepository;
 
     public BookingService(ServiceAssignmentRepository serviceAssignmentRepository) {
@@ -48,7 +52,9 @@ public class BookingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
         System.out.println("User email derived in createBooking method: " + userEmail);
-        User user = userRepository.findByEmail(userEmail)
+
+        String encryptedEmail = encryptionUtil.encrypt(userEmail);
+        User user = userRepository.findByEmail(encryptedEmail)
                 .orElseThrow(() -> new RuntimeException("Current logged-in user not found, coming from createBooking"));
 
         //Long userId = bookingRequest.getUserId();

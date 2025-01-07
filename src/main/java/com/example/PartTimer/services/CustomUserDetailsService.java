@@ -4,6 +4,8 @@ import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.labour.Labour;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.repositories.labour.LabourRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +23,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final LabourRepository labourRepository;
 
+    @Autowired
+    EncryptionUtil encryptionUtil;
+
     public CustomUserDetailsService(UserRepository userRepository, LabourRepository labourRepository) {
         this.userRepository = userRepository;
         this.labourRepository = labourRepository;
@@ -37,7 +42,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 //                .build();
 
         // First, try to find in User table
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        String encryptedEmail = encryptionUtil.encrypt(email);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             return new org.springframework.security.core.userdetails.User(
@@ -48,7 +54,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // Then, try to find in Labour table
-        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(email); // Assuming phone number is used for login
+        String encryptedPhone = encryptionUtil.encrypt(email);
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(encryptedPhone); // Assuming phone number is used for login
         if (labourOptional.isPresent()) {
             Labour labour = labourOptional.get();
             return new org.springframework.security.core.userdetails.User(

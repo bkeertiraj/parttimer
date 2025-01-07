@@ -11,6 +11,7 @@ import com.example.PartTimer.repositories.labour.LabourAssignmentRepository;
 import com.example.PartTimer.repositories.labour.LabourBookingRepository;
 import com.example.PartTimer.repositories.labour.LabourPriceOfferCountRepository;
 import com.example.PartTimer.repositories.labour.LabourPriceOfferRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,9 @@ public class LabourBookingService {
     @Autowired
     private LabourPriceOfferCountRepository labourPriceOfferCountRepository;
 
+    @Autowired
+    EncryptionUtil encryptionUtil;
+
     @Transactional
     public LabourBooking createLabourBooking(LabourBookingDTO labourBookingDTO) {
 
@@ -62,7 +66,8 @@ public class LabourBookingService {
             throw new IllegalStateException("Could not extract user authentication", e);
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        String encryptedEmail = encryptionUtil.encrypt(userEmail);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         User currentUser = userOptional.get();
         System.out.println("User email from checking the email: " + currentUser .getEmail());
 

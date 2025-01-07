@@ -228,17 +228,6 @@ public class AuthController {
                     .body(Map.of("error", "Unauthorized access"));
         }
 
-//
-//        String username;
-//        if (authentication.getPrincipal() instanceof UserDetails) {
-//            username = ((UserDetails) authentication.getPrincipal()).getUsername();
-//        } else if (authentication.getPrincipal() instanceof String) {
-//            username = (String) authentication.getPrincipal();
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(Map.of("error", "Invalid authentication principal"));
-//        }
-
         String identifier; // email for User, phone number for Labour
         if (authentication.getPrincipal() instanceof UserDetails) {
             identifier = ((UserDetails) authentication.getPrincipal()).getUsername();
@@ -250,8 +239,7 @@ public class AuthController {
         }
 
         // Try to fetch from User table
-        String encryptedEmail = encryptionUtil.encrypt(identifier);
-        Optional<User> userOptional = userService.findByEmail(encryptedEmail);
+        Optional<User> userOptional = userService.findByEmail(identifier);
         if (userOptional.isPresent()) {
             User currentUser = userOptional.get();
             Map<String, Object> response = new HashMap<>();
@@ -286,7 +274,6 @@ public class AuthController {
             response.put("name", labour.getFirstName() + " " + labour.getLastName());
             response.put("phone", labour.getPhoneNumber());
             response.put("average_rating", labour.getAverageRating());
-            // Add other relevant Labour details
 
             return ResponseEntity.ok(response);
         }
@@ -297,37 +284,6 @@ public class AuthController {
 
     @PostMapping("/check-user")
     public ResponseEntity<CheckUserResponse> checkUser(@RequestBody CheckUserRequest request) {
-//        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
-//
-//        if (userOptional.isEmpty()) {
-//            // User does not exist
-//            return ResponseEntity.ok(new CheckUserResponse(false, false, ""));
-//        }
-//        User user = userOptional.get();
-//        // Check profile completeness
-//        List<String> missingFields = new ArrayList<>();
-//
-//        if (user.getCountry() == null || user.getCountry().isEmpty()) {
-//            missingFields.add("country");
-//        }
-//        if (user.getState() == null || user.getState().isEmpty()) {
-//            missingFields.add("state");
-//        }
-//        if (user.getCity() == null || user.getCity().isEmpty()) {
-//            missingFields.add("city");
-//        }
-//        if (user.getZipcode() == null || user.getZipcode().isEmpty()) {
-//            missingFields.add("zipcode");
-//        }
-//        boolean isProfileComplete = missingFields.isEmpty();
-//        String missingFieldsStr = String.join(", ", missingFields);
-//
-//        return ResponseEntity.ok(new CheckUserResponse(
-//                true,
-//                isProfileComplete,
-//                missingFieldsStr
-//        ));
-
         // First, check in User repository
         String encryptedEmail = encryptionUtil.encrypt(request.getEmail());
         Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
@@ -360,7 +316,8 @@ public class AuthController {
         }
 
         // If not found in User, check in Labour repository
-        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(request.getEmail());
+        String encryptedPhone = encryptionUtil.encrypt(request.getEmail());
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(encryptedPhone);
         if (labourOptional.isPresent()) {
             Labour labour = labourOptional.get();
             // Check profile completeness for Labour

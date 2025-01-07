@@ -3,6 +3,7 @@ package com.example.PartTimer.services;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.UserRole;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,9 +15,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
@@ -27,6 +26,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
     @Lazy
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    EncryptionUtil encryptionUtil;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -47,7 +49,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         }
 
         // Check if user already exists
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        String encryptedEmail = encryptionUtil.encrypt(email);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         User user;
 
         if (userOptional.isPresent()) {
@@ -58,9 +61,18 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             user = registerNewUser(oauth2User);
         }
 
+//        return new DefaultOAuth2User(
+//                Collections.singleton(new SimpleGrantedAuthority(user.getUserRole().name())),
+//                oauth2User.getAttributes(),
+//                "email"
+//        );
+        // Create a custom attributes map with the encrypted email
+        Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
+        attributes.put("email", encryptedEmail); // Store encrypted email in authentication
+
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(user.getUserRole().name())),
-                oauth2User.getAttributes(),
+                attributes,
                 "email"
         );
     }

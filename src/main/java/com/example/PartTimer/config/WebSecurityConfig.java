@@ -8,6 +8,7 @@ import com.example.PartTimer.security.MultiUserAuthenticationProvider;
 import com.example.PartTimer.services.CustomUserDetailsService;
 import com.example.PartTimer.services.JwtService;
 import com.example.PartTimer.services.OAuth2UserService;
+import com.example.PartTimer.utils.EncryptionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.Cookie;
@@ -62,6 +63,9 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final UserRepository userRepository;
+
+    @Autowired
+    EncryptionUtil encryptionUtil;
 
 //    @Lazy
     private final MultiUserAuthenticationProvider multiUserAuthenticationProvider;
@@ -125,7 +129,8 @@ public class WebSecurityConfig {
                             // Fetch UserDetails using the email
                             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                            User userEntity = userRepository.findByEmail(email)
+                            String encryptedEmail = encryptionUtil.encrypt(email);
+                            User userEntity = userRepository.findByEmail(encryptedEmail)
                                     .orElseThrow(() -> new IllegalStateException("User not found"));
 
                             // Pass UserDetails to generateToken

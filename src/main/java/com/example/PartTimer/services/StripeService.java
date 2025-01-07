@@ -4,6 +4,7 @@ import com.example.PartTimer.dto.stripe.ProductRequest;
 import com.example.PartTimer.dto.stripe.StripeResponse;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
@@ -34,6 +35,9 @@ public class StripeService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    EncryptionUtil encryptionUtil;
+
     public StripeResponse checkoutProducts(ProductRequest productRequest) {
         Stripe.apiKey = secretKey;
 
@@ -62,7 +66,8 @@ public class StripeService {
             throw new IllegalStateException("Could not extract user authentication", e);
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        String encryptedEmail = encryptionUtil.encrypt(userEmail);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         System.out.println("User email in checkout: " + userEmail);
         if(userOptional.isPresent()) {
             User user = userOptional.get();

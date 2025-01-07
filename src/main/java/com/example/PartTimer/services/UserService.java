@@ -2,6 +2,7 @@ package com.example.PartTimer.services;
 
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +18,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    EncryptionUtil encryptionUtil;
 
 //    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -73,6 +77,7 @@ public class UserService {
     }
 
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        String encryptedEmail = encryptionUtil.encrypt(email);
+        return userRepository.findByEmail(encryptedEmail);
     }
 }

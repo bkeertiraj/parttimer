@@ -4,6 +4,7 @@ import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.labour.Labour;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.repositories.labour.LabourRepository;
+import com.example.PartTimer.utils.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -40,13 +41,17 @@ public class MultiUserAuthenticationProvider implements AuthenticationProvider {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Autowired
+    EncryptionUtil encryptionUtil;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
 
         // First, check User table
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        String encryptedEmail = encryptionUtil.encrypt(email);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
         if (userOptional.isPresent() && passwordEncoder.matches(password, userOptional.get().getPassword())) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,
@@ -57,7 +62,8 @@ public class MultiUserAuthenticationProvider implements AuthenticationProvider {
         }
 
         // Then, check Labour table
-        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(email); // Assuming phone number is used for login
+        String encryptedPhone = encryptionUtil.encrypt(email);
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(encryptedPhone); // Assuming phone number is used for login
         if (labourOptional.isPresent() && passwordEncoder.matches(password, labourOptional.get().getPassword())) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,
