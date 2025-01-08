@@ -47,7 +47,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             return new org.springframework.security.core.userdetails.User(
-                    user.getEmail(),
+                    email,
                     user.getPassword(),
                     Collections.singletonList(new SimpleGrantedAuthority(user.getUserRole().name()))
             );

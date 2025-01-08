@@ -19,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Lazy
@@ -50,8 +52,30 @@ public class MultiUserAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         // First, check User table
+        System.out.println("Raw login email: " + email);
         String encryptedEmail = encryptionUtil.encrypt(email);
+        System.out.println("Encrypted login email: " + encryptedEmail);
+
+        // Query database directly to see what's stored
+        List<User> allUsers = userRepository.findAll();
+        System.out.println("All users in database:");
+        for (User user : allUsers) {
+            System.out.println("Stored email: " + user.getEmail());
+        }
+
         Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
+        System.out.println("User found: " + userOptional.isPresent());
+
+        // Add this debug section
+        if (!userOptional.isPresent()) {
+            System.out.println("No user found with encrypted email: " + encryptedEmail);
+            // Maybe add a database query to show all encrypted emails for debugging
+            List<String> allEmails = userRepository.findAll().stream()
+                    .map(User::getEmail)
+                    .collect(Collectors.toList());
+            System.out.println("Available encrypted emails in database: " + allEmails);
+        }
+
         if (userOptional.isPresent() && passwordEncoder.matches(password, userOptional.get().getPassword())) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,

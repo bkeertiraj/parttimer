@@ -20,7 +20,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    EncryptionUtil encryptionUtil;
+    private EncryptionUtil encryptionUtil;
 
 //    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -34,6 +34,10 @@ public class UserService {
 
     //sign-up
     public User signUp(User user) {
+//        user.setPassword(encoder.encode(user.getPassword()));
+//        return userRepository.save(user);
+        String encryptedEmail = encryptionUtil.encrypt(user.getEmail());
+        user.setEmail(encryptedEmail);
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -72,6 +76,7 @@ public class UserService {
             );
             return true;
         } catch (AuthenticationException e) {
+            System.out.println("Authentication failed: " + e.getMessage());
             return false;
         }
     }
