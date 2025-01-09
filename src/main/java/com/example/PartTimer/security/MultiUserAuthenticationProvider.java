@@ -86,8 +86,7 @@ public class MultiUserAuthenticationProvider implements AuthenticationProvider {
         }
 
         // Then, check Labour table
-        String encryptedPhone = encryptionUtil.encrypt(email);
-        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(encryptedPhone); // Assuming phone number is used for login
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(email); // Assuming phone number is used for login
         if (labourOptional.isPresent() && passwordEncoder.matches(password, labourOptional.get().getPassword())) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     email,
