@@ -246,7 +246,8 @@ public class AuthController {
             response.put("user_type", "USER");
             response.put("user_id", currentUser.getUserId());
             response.put("name", currentUser.getFullName());
-            response.put("email", currentUser.getEmail());
+            String decryptedEmail = encryptionUtil.decrypt(currentUser.getEmail());
+            response.put("email", decryptedEmail);
             response.put("user_role", currentUser.getUserRole());
             response.put("points", currentUser.getPoints());
             response.put("user subscription", currentUser.isUserSubscription());
@@ -287,7 +288,9 @@ public class AuthController {
         // First, check in User repository
         String encryptedEmail = encryptionUtil.encrypt(request.getEmail());
         Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
+        System.out.println( "is user present in check-user" + userOptional.isPresent());
         if (userOptional.isPresent()) {
+            System.out.println("user is present in check-user");
             User user = userOptional.get();
             // Check profile completeness for User
             List<String> missingFields = new ArrayList<>();
