@@ -54,8 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // Then, try to find in Labour table
-        String encryptedPhone = encryptionUtil.encrypt(email);
-        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(encryptedPhone); // Assuming phone number is used for login
+        Optional<Labour> labourOptional = labourRepository.findByPhoneNumber(email); // Assuming phone number is used for login
         if (labourOptional.isPresent()) {
             Labour labour = labourOptional.get();
             return new org.springframework.security.core.userdetails.User(
