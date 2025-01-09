@@ -107,7 +107,8 @@ public class LabourBookingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
-        List<LabourBooking> bookings = labourBookingRepository.findByUserEmailOrderByCreatedAtDesc(userEmail);
+        String encryptedEmail = encryptionUtil.encrypt(userEmail);
+        List<LabourBooking> bookings = labourBookingRepository.findByUserEmailOrderByCreatedAtDesc(encryptedEmail);
         return bookings.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
