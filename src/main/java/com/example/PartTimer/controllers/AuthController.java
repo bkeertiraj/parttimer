@@ -78,7 +78,7 @@ public class AuthController {
         user.setCountry(userDTO.getCountry());
         user.setState(userDTO.getState());
         user.setCity(userDTO.getCity());
-        user.setZipcode(userDTO.getZipcode());
+        user.setZipcode(userDTO.getZipCode());
 
         user.setDocsVerified(userDTO.isDocsVerified());
         user.setTypeOfVerificationFile(userDTO.getTypeOfVerificationFile());
