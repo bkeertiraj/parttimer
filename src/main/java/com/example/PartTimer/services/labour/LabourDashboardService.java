@@ -1,8 +1,6 @@
 package com.example.PartTimer.services.labour;
 
-import com.example.PartTimer.dto.labour.LabourBookingsByUserDTO;
-import com.example.PartTimer.dto.labour.LabourPriceOfferDTO;
-import com.example.PartTimer.dto.labour.OpenBookingsForLabourDashboardDTO;
+import com.example.PartTimer.dto.labour.*;
 import com.example.PartTimer.entities.labour.*;
 import com.example.PartTimer.repositories.labour.*;
 import jakarta.transaction.Transactional;
@@ -123,5 +121,57 @@ public class LabourDashboardService {
 
         System.out.println("after the offerCount block");
         return priceOfferRepository.save(savedOffer);
+    }
+
+    public List<LabourPendingOffersDTO> getPendingOffersByLabour(Long labourId) {
+        return priceOfferRepository.findByLabourIdAndStatus(labourId, LabourPriceOfferStatus.PENDING)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private LabourPendingOffersDTO convertToDTO(LabourPriceOffer offer) {
+        LabourPendingOffersDTO dto = new LabourPendingOffersDTO();
+        dto.setOfferId(offer.getId());
+        dto.setLabourAssignmentId(offer.getLabourAssignment().getId());
+        dto.setLabourId(offer.getLabour().getId());
+        dto.setBookingId(offer.getLabourAssignment().getBooking().getId());
+        dto.setOfferedPrice(offer.getOfferedPrice());
+        dto.setStatus(offer.getStatus());
+        dto.setBookingAddress(offer.getLabourAssignment().getBooking().getAddress());
+        dto.setBookingNote(offer.getLabourAssignment().getBookingNote());
+        dto.setBookingDate(offer.getLabourAssignment().getBookingDate().toString());
+        dto.setTimeSlot(offer.getLabourAssignment().getTimeSlot());
+        dto.setOfferCreatedAt(offer.getCreatedAt());
+        return dto;
+    }
+
+    @Transactional
+    public LabourPriceOffer editPriceOffer(Long labourId, EditPriceOfferDTO editDTO) {
+        // Fetch the existing price offer
+        LabourPriceOffer existingOffer = priceOfferRepository.findById(editDTO.getPriceOfferId())
+                .orElseThrow(() -> new RuntimeException("Price offer not found"));
+
+        // Validate that the offer belongs to the labour
+        if (!existingOffer.getLabour().getId().equals(labourId)) {
+            throw new RuntimeException("Unauthorized to edit this price offer");
+        }
+
+        // Check if the offer is still pending
+        if (existingOffer.getStatus() != LabourPriceOfferStatus.PENDING) {
+            throw new IllegalStateException("Can only edit pending price offers");
+        }
+
+        // Check if the booking is still open
+        if (existingOffer.getLabourAssignment().getBookingStatus() != LabourBookingStatus.OPEN) {
+            throw new IllegalStateException("Cannot edit price offer for non-open bookings");
+        }
+
+        // Update the price offer
+        existingOffer.setOfferedPrice(editDTO.getNewPrice());
+        existingOffer.setUpdatedAt(LocalDateTime.now());
+
+        // Save and return the updated offer
+        return priceOfferRepository.save(existingOffer);
     }
 }

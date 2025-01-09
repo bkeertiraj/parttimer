@@ -3,10 +3,7 @@ package com.example.PartTimer.services.labour;
 import com.example.PartTimer.dto.labour.LabourPriceHistoryDTO;
 import com.example.PartTimer.dto.labour.LabourPriceOfferDetailsDTO;
 import com.example.PartTimer.entities.User;
-import com.example.PartTimer.entities.labour.LabourAssignment;
-import com.example.PartTimer.entities.labour.LabourBooking;
-import com.example.PartTimer.entities.labour.LabourPriceOffer;
-import com.example.PartTimer.entities.labour.LabourPriceOfferStatus;
+import com.example.PartTimer.entities.labour.*;
 import com.example.PartTimer.repositories.labour.LabourPriceOfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +18,11 @@ public class LabourPriceHistoryService {
     private final LabourPriceOfferRepository labourPriceOfferRepository;
 
     public List<LabourPriceHistoryDTO> getLabourPriceHistory(Long labourId) {
-        List<LabourPriceOffer> priceOffers = labourPriceOfferRepository.findByLabourIdOrderByCreatedAtDesc(labourId);
-
+        List<LabourPriceOffer> priceOffers = labourPriceOfferRepository.findLabourPriceHistory(
+                labourId,
+                LabourPriceOfferStatus.PENDING,
+                LabourBookingStatus.OPEN
+        );
         return priceOffers.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
