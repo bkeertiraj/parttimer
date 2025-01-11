@@ -52,4 +52,9 @@ public interface LabourPriceOfferRepository extends JpaRepository<LabourPriceOff
             @Param("bookingStatus") LabourBookingStatus bookingStatus
     );
 
+    Optional<LabourPriceOffer> findByLabourAssignmentAndLabourAndStatus(
+            LabourAssignment labourAssignment,
+            Labour labour,
+            LabourPriceOfferStatus status
+    );
 }
