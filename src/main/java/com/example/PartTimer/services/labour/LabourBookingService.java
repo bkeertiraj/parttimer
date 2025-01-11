@@ -1,9 +1,6 @@
 package com.example.PartTimer.services.labour;
 
-import com.example.PartTimer.dto.labour.LabourAssignmentDetailsDTO;
-import com.example.PartTimer.dto.labour.LabourBookingDTO;
-import com.example.PartTimer.dto.labour.LabourBookingsByUserDTO;
-import com.example.PartTimer.dto.labour.PriceOfferDetailsDTO;
+import com.example.PartTimer.dto.labour.*;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.entities.labour.*;
 import com.example.PartTimer.repositories.UserRepository;
@@ -229,6 +226,21 @@ public class LabourBookingService {
         dto.setLocation(booking.getAddress());
         dto.setZipcode(booking.getZipcode());
         dto.setCity(booking.getCity());
+
+        // Add selected labour details only if status is ACCEPTED
+        if (labourAssignment.getBookingStatus() == LabourBookingStatus.ACCEPTED) {
+            Labour selectedLabour = labourAssignment.getLabour();
+            if (selectedLabour != null) {
+                SelectedLabourDTO labourDTO = new SelectedLabourDTO();
+                labourDTO.setLabourId(selectedLabour.getId());
+                labourDTO.setFirstName(selectedLabour.getFirstName());
+                labourDTO.setLastName(selectedLabour.getLastName());
+                labourDTO.setPhoneNumber(selectedLabour.getPhoneNumber());
+                dto.setSelectedLabour(labourDTO);
+            }
+        } else {
+            dto.setSelectedLabour(null);
+        }
 
         return dto;
     }

@@ -97,6 +97,14 @@ public class LabourReviewService {
         return feedbackRepository.existsByUser_UserIdAndBookingId(userId, bookingId);
     }
 
+    public boolean hasLabourReviewedBooking(Long labourId, Long bookingId) {
+        return feedbackRepository.existsByLabourIdAndBookingIdAndFeedbackType(
+                labourId,
+                bookingId,
+                LabourFeedbackType.LABOUR_TO_USER
+        );
+    }
+
     private boolean isBookingAccepted(LabourBooking booking) {
         return booking.getLabourAssignments().stream()
                 .anyMatch(assignment -> assignment.getBookingStatus() == LabourBookingStatus.ACCEPTED);
@@ -168,4 +176,5 @@ public class LabourReviewService {
         LabourFeedback savedFeedback = feedbackRepository.save(feedback);
         return convertToResponseDTO(savedFeedback);
     }
+
 }

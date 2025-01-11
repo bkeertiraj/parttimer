@@ -36,7 +36,7 @@ public class LabourReviewController {
         this.labourRepository = labourRepository;
     }
 
-    @PostMapping
+    @PostMapping("/user-review")
     public ResponseEntity<LabourReviewResponseDTO> submitReview(@RequestBody LabourReviewDTO reviewDTO) {
         // Get current authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -77,7 +77,7 @@ public class LabourReviewController {
         return ResponseEntity.ok(reviewService.getLabourAverageRating(labourId));
     }
 
-    @GetMapping("/check")
+    @GetMapping("/check-user-review") //check user review
     public ResponseEntity<Boolean> checkUserReview(@RequestParam Long bookingId) {
         // Get current authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -97,7 +97,32 @@ public class LabourReviewController {
         return ResponseEntity.ok(reviewService.hasUserReviewedBooking(user.getUserId(), bookingId));
     }
 
-    @PostMapping("/user-review")
+    @GetMapping("/check-labour-review")
+    public ResponseEntity<Boolean> checkLabourReview(@RequestParam Long bookingId) {
+        try {
+            // Get current authenticated labour
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String labourEmail = authentication.getName();
+
+            if (labourEmail == null || "anonymousUser".equals(labourEmail)) {
+                throw new IllegalStateException("Labour is not authenticated");
+            }
+
+            // Get labour from email (phone number)
+            Labour labour = labourRepository.findByPhoneNumber(labourEmail)
+                    .orElseThrow(() -> new IllegalStateException("Labour not found"));
+
+            boolean hasReviewed = reviewService.hasLabourReviewedBooking(labour.getId(), bookingId);
+            return ResponseEntity.ok(hasReviewed);
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    @PostMapping("/labour-review")
     public ResponseEntity<?> submitUserReview(@RequestBody LabourReviewDTO reviewDTO) {
         try {
             // Get current authenticated labour

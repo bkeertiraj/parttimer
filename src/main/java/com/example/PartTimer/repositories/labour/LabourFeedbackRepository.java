@@ -23,4 +23,9 @@ public interface LabourFeedbackRepository extends JpaRepository<LabourFeedback, 
 
     boolean existsByLabourIdAndBookingId(Long labourId, Long bookingId);
 
+    boolean existsByLabourIdAndBookingIdAndFeedbackType(
+            Long labourId,
+            Long bookingId,
+            LabourFeedbackType feedbackType
+    );
 }

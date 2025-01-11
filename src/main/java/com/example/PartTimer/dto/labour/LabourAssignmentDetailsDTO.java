@@ -13,4 +13,6 @@ public class LabourAssignmentDetailsDTO {
     private String location;
     private String zipcode;
     private String city;
+
+    private SelectedLabourDTO selectedLabour;
 }
