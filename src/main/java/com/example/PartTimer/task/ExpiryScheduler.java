@@ -25,7 +25,7 @@ public class ExpiryScheduler {
     private LabourAssignmentRepository labourAssignmentRepository;
 
     @Transactional
-    @Scheduled(cron = "0 * * * * ?") //every minute -> cron = "0 */1 * * * ?", runs at midnight -> everyday cron = "0 0 0 * * ?", fixedRate = 10000 -> Runs every 10 seconds
+    @Scheduled(cron = "0 30 9 * * ?") //will run on 9.30 am, every minute -> cron = "0 */1 * * * ?", runs at midnight -> everyday cron = "0 0 0 * * ?", fixedRate = 10000 -> Runs every 10 seconds
     public void updateExpiredBookingsAndOffers() {
         System.out.println("Starting expiry update job");
         // Fetch labour assignments that are not completed or expired and are past their booking date
