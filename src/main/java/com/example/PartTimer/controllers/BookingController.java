@@ -6,6 +6,7 @@ import com.example.PartTimer.entities.Booking;
 import com.example.PartTimer.entities.User;
 import com.example.PartTimer.repositories.UserRepository;
 import com.example.PartTimer.services.BookingService;
+import com.example.PartTimer.utils.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -23,6 +25,9 @@ public class BookingController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EncryptionUtil encryptionUtil;
 
     @PostMapping("/book")
     public ResponseEntity<Booking> bookService(@RequestBody BookingRequestDTO bookingRequest) {
@@ -36,7 +41,9 @@ public class BookingController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
-        User user = userRepository.findByEmail(userEmail)
+        String encryptedEmail = encryptionUtil.encrypt(userEmail);
+        Optional<User> userOptional = userRepository.findByEmail(encryptedEmail);
+        User user = userRepository.findByEmail(encryptedEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<UserBookingsDTO> bookings = bookingService.getUserBookings(user);
