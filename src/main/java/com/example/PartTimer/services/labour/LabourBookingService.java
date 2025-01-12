@@ -227,9 +227,12 @@ public class LabourBookingService {
         dto.setZipcode(booking.getZipcode());
         dto.setCity(booking.getCity());
 
+        System.out.println("Labour assignment booking status: " + labourAssignment.getBookingStatus());
+
         // Add selected labour details only if status is ACCEPTED
         if (labourAssignment.getBookingStatus() == LabourBookingStatus.ACCEPTED) {
             Labour selectedLabour = labourAssignment.getLabour();
+            System.out.println("Selected labour: " + labourAssignment.getLabour().getFirstName() + labourAssignment.getLabour().getPhoneNumber());
             if (selectedLabour != null) {
                 SelectedLabourDTO labourDTO = new SelectedLabourDTO();
                 labourDTO.setLabourId(selectedLabour.getId());
@@ -239,6 +242,8 @@ public class LabourBookingService {
                 dto.setSelectedLabour(labourDTO);
             }
         } else {
+            System.out.println("showing null");
+            System.out.println("Selected labour: " + labourAssignment.getLabour().getFirstName() + labourAssignment.getLabour().getPhoneNumber());
             dto.setSelectedLabour(null);
         }
 
@@ -291,6 +296,9 @@ public class LabourBookingService {
 
         // Set the selected price offer to ACCEPTED
         selectedPriceOffer.setStatus(LabourPriceOfferStatus.ACCEPTED);
+        System.out.println("selected labour: " + selectedLabour);
+        selectedAssignment.setLabour(selectedLabour);
+        selectedPriceOffer.setLabour(selectedLabour);
         priceOfferRepository.save(selectedPriceOffer);
 
         // Update the corresponding labour assignment status
